@@ -130,3 +130,15 @@ AWS_S3_CUSTOM_DOMAIN = (
     f"{SUPABASE_PROJECT_REF}.supabase.co"
     f"/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
 )
+
+# Semua file media dikelola django-storages
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"

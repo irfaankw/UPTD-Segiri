@@ -1,7 +1,157 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <h1 class="text-2xl font-bold">Profil UPTD</h1>
+<div class="bg-background text-on-surface">
+
+    <!-- HERO -->
+    <section class="relative overflow-hidden py-20 px-6 text-center bg-gradient-to-b from-primary-container/25 via-background to-background">
+        <h1 class="text-4xl md:text-5xl font-bold text-on-surface tracking-tight">Profil Institusi</h1>
+        <p class="mt-4 text-on-surface-variant text-lg max-w-xl mx-auto">
+            Mengenal lebih dekat Unit Pelaksana Teknis Daerah Pasar Segiri Kota Samarinda
+        </p>
+    </section>
+
+    <!-- SAMBUTAN PIMPINAN -->
+    <section class="py-16 px-6 max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <p class="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-3">Sambutan Pimpinan</p>
+                {% if profil.sambutan_judul %}
+                <h2 class="text-2xl md:text-3xl font-bold text-on-surface mb-5 leading-snug">
+                    {{ profil.sambutan_judul }}
+                </h2>
+                {% endif %}
+                <div class="text-on-surface-variant space-y-4 leading-relaxed">
+                    {{ profil.sambutan_isi|linebreaks }}
+                </div>
+                <div class="mt-6">
+                    <p class="font-bold text-on-surface">{{ profil.nama_kepala }}</p>
+                    <p class="text-sm text-outline">{{ profil.jabatan_kepala }}</p>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="absolute inset-0 translate-x-3 translate-y-3 rounded-xl bg-primary-container"></div>
+                {% if profil.foto_kepala %}
+                <img src="{{ profil.foto_kepala.url }}" alt="{{ profil.nama_kepala }}"
+                     class="relative rounded-xl w-full object-cover aspect-[4/5] border border-outline-variant">
+                {% else %}
+                <div class="relative rounded-xl w-full aspect-[4/5] bg-surface-container-high border border-outline-variant flex items-center justify-center text-outline">
+                    Foto belum diunggah
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- VISI -->
+    <section class="py-16 px-6 bg-surface-container-low">
+        <div class="max-w-3xl mx-auto text-center relative">
+            <span class="text-primary/30 text-6xl font-serif absolute -top-6 left-0">&ldquo;</span>
+            <p class="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-4">Visi</p>
+            <p class="text-xl md:text-2xl font-semibold italic text-on-surface leading-relaxed">
+                "{{ profil.visi }}"
+            </p>
+            <span class="text-primary/30 text-6xl font-serif absolute -bottom-10 right-0">&rdquo;</span>
+        </div>
+    </section>
+
+    <!-- MISI -->
+    <section class="py-16 px-6 max-w-3xl mx-auto">
+        <div class="text-center mb-10">
+            <p class="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-2">Misi UPTD</p>
+            <h2 class="text-xl font-semibold text-on-surface">Komitmen Pelayanan Kami</h2>
+        </div>
+        <div class="space-y-6">
+            {% for misi in profil.misi_list.all %}
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 shrink-0 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-sm font-bold">
+                    {{ misi.urutan }}
+                </div>
+                <p class="text-on-surface-variant leading-relaxed pt-1">{{ misi.isi }}</p>
+            </div>
+            {% empty %}
+            <p class="text-outline text-center">Data misi belum ditambahkan.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- STRUKTUR ORGANISASI -->
+    <section class="py-16 px-6 bg-surface-container-low">
+        <div class="max-w-4xl mx-auto text-center mb-8">
+            <p class="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-2">Struktur Organisasi</p>
+            <h2 class="text-xl font-semibold text-on-surface">Hierarki Kepemimpinan UPTD Pasar Segiri Samarinda</h2>
+        </div>
+        <div class="max-w-4xl mx-auto rounded-xl border border-outline-variant bg-surface-container p-4">
+            {% if profil.struktur_organisasi %}
+            <img src="{{ profil.struktur_organisasi.url }}" alt="Struktur Organisasi UPTD Pasar Segiri"
+                 class="w-full rounded-lg">
+            {% else %}
+            <div class="py-24 text-center text-outline">
+                Bagan struktur organisasi belum diunggah.
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- LOKASI -->
+    <section class="py-16 px-6 max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-6">
+
+            <div class="rounded-xl overflow-hidden border border-outline-variant min-h-[400px]">
+                {% if profil.google_maps_embed_url %}
+                <iframe
+                    src="{{ profil.google_maps_embed_url }}"
+                    class="w-full h-full min-h-[400px]"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+                {% else %}
+                <div class="w-full h-full min-h-[400px] flex items-center justify-center text-outline bg-surface-container">
+                    Peta belum tersedia
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <div class="rounded-xl bg-primary-container p-6">
+                    <p class="text-on-primary-container text-xs font-bold tracking-widest uppercase mb-2">Lokasi Kantor</p>
+                    <p class="text-white leading-relaxed mb-4">{{ profil.alamat }}</p>
+                    {% if profil.google_maps_link %}
+                    <a href="{{ profil.google_maps_link }}" target="_blank" rel="noopener"
+                       class="inline-block text-sm font-semibold text-white border border-white/40 rounded px-4 py-2 hover:bg-white/10 transition">
+                        Buka di Google Maps
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="rounded-xl bg-surface-container border border-outline-variant p-6 flex-1">
+                    <p class="text-primary text-xs font-bold tracking-widest uppercase mb-4">Jam Operasional</p>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b border-outline-variant pb-2">
+                            <span class="text-on-surface-variant">Senin - Kamis</span>
+                            <span class="text-on-surface font-medium">{{ profil.jam_senin_kamis }}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-outline-variant pb-2">
+                            <span class="text-on-surface-variant">Jumat</span>
+                            <span class="text-on-surface font-medium">{{ profil.jam_jumat }}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-outline-variant pb-2">
+                            <span class="text-on-surface-variant">Sabtu</span>
+                            <span class="text-on-surface font-medium">{{ profil.jam_sabtu }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-outline">Minggu</span>
+                            <span class="text-primary font-medium">{{ profil.jam_minggu }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
 {% endblock content %}

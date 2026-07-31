@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import ProfilUPTD
 
 def home(request):
     context = {
@@ -8,8 +9,10 @@ def home(request):
     return render(request, 'core/home.html', context)
 
 def uptd_profile(request):
+    profil = ProfilUPTD.objects.first()
     context = {
-        'title' : 'Profil UPTD',
+        'title': 'Profil UPTD',
+        'profil': profil,
     }
     return render(request, 'core/uptd_profile.html', context)
 
@@ -18,3 +21,5 @@ def gallery(request):
         'title' : 'Galeri',
     }
     return render(request, 'core/gallery.html', context)
+
+    
