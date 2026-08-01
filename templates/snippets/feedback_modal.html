@@ -1,0 +1,108 @@
+{% load static %}
+<div id="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title"
+     class="feedback-modal fixed inset-0 z-[60] flex items-center justify-center px-4 py-8">
+    <div id="feedback-overlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+    <div class="feedback-panel custom-scroll relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-surface-container-high border border-outline-variant p-6 md:p-8 shadow-2xl">
+        <button id="feedback-close" type="button" aria-label="Tutup"
+                class="absolute top-5 right-5 text-outline hover:text-on-surface transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <h3 id="feedback-title" class="text-2xl font-bold text-primary mb-1">Sampaikan Masukan</h3>
+        <p class="text-sm text-on-surface-variant mb-6">
+            Kami menghargai setiap saran dan masukan untuk meningkatkan pelayanan UPTD Pasar Segiri.
+        </p>
+
+        <div id="feedback-general-error" class="hidden mb-4 text-sm rounded-lg px-4 py-3 bg-error-container/20 border border-error text-on-error-container"></div>
+
+        <form id="feedback-form" action="{% url 'complaint:submit' %}" method="post"
+              enctype="multipart/form-data" class="space-y-5" novalidate>
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-semibold text-on-surface mb-1.5">
+                    Nama Lengkap <span class="text-outline font-normal">(Kosongkan untuk mengirim sebagai Anonim)</span>
+                </label>
+                {{ pengaduan_form.nama }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-1.5">
+                        No. Telp <span class="text-outline font-normal">(opsional)</span>
+                    </label>
+                    {{ pengaduan_form.telepon }}
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-1.5">
+                        Email <span class="text-outline font-normal">(opsional)</span>
+                    </label>
+                    {{ pengaduan_form.email }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-on-surface mb-2">
+                    Kategori <span class="text-primary">*</span>
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    {% for radio in pengaduan_form.kategori %}
+                    <label class="cursor-pointer">
+                        {{ radio.tag }}
+                        <span class="kategori-pill peer-checked:bg-primary-container peer-checked:text-white peer-checked:border-primary-container inline-block text-sm rounded-full border border-outline-variant text-on-surface-variant px-4 py-2 hover:border-primary transition">
+                            {{ radio.choice_label }}
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <p id="error-kategori" class="hidden text-xs text-error mt-2"></p>
+
+                <div id="kategori-lainnya-wrap" class="hidden mt-3">
+                    {{ pengaduan_form.kategori_lainnya }}
+                    <p id="error-kategori_lainnya" class="hidden text-xs text-error mt-1"></p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-on-surface mb-1.5">
+                    Isi Pesan <span class="text-primary">*</span>
+                </label>
+                {{ pengaduan_form.pesan }}
+                <p id="error-pesan" class="hidden text-xs text-error mt-1"></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-on-surface mb-1.5">
+                    Lampiran <span class="text-outline font-normal">(opsional)</span>
+                </label>
+                <label for="id_lampiran"
+                       class="flex items-center gap-2 text-sm text-on-surface-variant border border-dashed border-outline-variant rounded-lg px-3.5 py-2.5 cursor-pointer hover:border-primary transition">
+                    <svg class="w-4 h-4 shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span id="feedback-file-label">Pilih file (foto/dokumen)</span>
+                </label>
+                {{ pengaduan_form.lampiran }}
+            </div>
+
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                Masukan Anda akan diteruskan langsung kepada pihak UPTD Pasar Segiri dan akan ditindaklanjuti sesuai prosedur yang berlaku.
+            </p>
+
+            <button id="feedback-submit" type="submit"
+                    class="w-full flex items-center justify-center gap-2 bg-primary-container text-white font-bold text-sm uppercase tracking-wide rounded-lg px-5 py-3.5 hover:brightness-110 transition disabled:opacity-70 disabled:cursor-not-allowed">
+                <svg id="feedback-submit-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <svg id="feedback-submit-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                <span id="feedback-submit-text">Kirim Masukan</span>
+            </button>
+        </form>
+    </div>
+</div>

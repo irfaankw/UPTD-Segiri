@@ -6,12 +6,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'dist/output.css' %}">
 </head>
-<body>
+<body class="bg-background text-on-surface font-sans antialiased">
     {% include "snippets/navbar.html" %}
+
     {% block content %}
-    
+
     {% endblock content %}
+
+    {% include "snippets/footer.html" %}
+    {% include "snippets/toast.html" %}
+    {% include "snippets/feedback_button.html" %}
+    {% include "snippets/feedback_modal.html" %}
+
+    <script src="{% static 'js/feedback.js' %}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+            els.forEach(el => io.observe(el));
+        });
+    </script>
 </body>
 </html>
