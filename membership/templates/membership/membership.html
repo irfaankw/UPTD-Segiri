@@ -1,1 +1,103 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-surface text-on-surface min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header Section -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-on-surface mb-3">
+                Struktur Keanggotaan
+            </h1>
+            <p class="text-on-surface/80 text-sm sm:text-base leading-relaxed">
+                Dedikasi tim kami dalam mengelola dan melayani ekosistem Pasar Segiri Samarinda dengan profesionalisme dan integritas.
+            </p>
+        </div>
+
+        <!-- Section 1: Pimpinan -->
+        {% if pimpinan_list %}
+        <div class="mb-16">
+            <div class="flex items-center gap-4 mb-8">
+                <h2 class="text-lg font-bold text-primary uppercase tracking-wider whitespace-nowrap">Pimpinan</h2>
+                <div class="h-[1px] w-full bg-outline-variant"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for p in pimpinan_list %}
+                <a href="{% url 'membership:detail' p.pk %}" class="group bg-surface-container border border-outline-variant rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start shadow-md hover:border-primary transition-all duration-300">
+                    <!-- Foto -->
+                    <div class="w-32 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant flex items-center justify-center">
+                        {% if p.foto %}
+                            <img src="{{ p.foto.url }}" alt="{{ p.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        {% else %}
+                            <span class="text-on-surface/50 text-xs font-semibold">No Image</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Informasi Pimpinan -->
+                    <div class="flex-1 text-center sm:text-left flex flex-col justify-between h-full py-1">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-primary block mb-1">
+                                {{ p.jabatan }}
+                            </span>
+                            <h3 class="text-xl font-bold text-on-surface group-hover:text-primary transition-colors mb-1">
+                                {{ p.nama }}
+                            </h3>
+                            {% if p.nip %}
+                            <p class="text-xs text-on-surface/70 font-mono">
+                                NIP. {{ p.nip }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email Icon -->
+                        <div class="flex justify-center sm:justify-start gap-2 mt-4">
+                            {% if p.email %}
+                            <span title="{{ p.email }}" class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-on-surface/80 group-hover:text-primary group-hover:border-primary transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Section 2: Staf & Koordinator Lapangan -->
+        {% if staf_list %}
+        <div>
+            <div class="flex items-center gap-4 mb-10">
+                <h2 class="text-lg font-bold text-primary uppercase tracking-wider whitespace-nowrap">Staf & Koordinator Lapangan</h2>
+                <div class="h-[1px] w-full bg-outline-variant"></div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+                {% for staf in staf_list %}
+                <a href="{% url 'membership:detail' staf.pk %}" class="flex flex-col items-center text-center group">
+                    <!-- Foto Bulat -->
+                    <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container-low mb-4 shadow-md group-hover:border-primary transition-all duration-300 flex items-center justify-center">
+                        {% if staf.foto %}
+                            <img src="{{ staf.foto.url }}" alt="{{ staf.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        {% else %}
+                            <span class="text-on-surface/50 text-xs font-semibold">No Image</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Nama & Jabatan -->
+                    <h4 class="text-base font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">
+                        {{ staf.nama }}
+                    </h4>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-primary max-w-[180px]">
+                        {{ staf.jabatan }}
+                    </p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

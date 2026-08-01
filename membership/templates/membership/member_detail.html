@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-surface text-on-surface min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex text-xs text-on-surface/60 mb-8 gap-2 items-center">
+            <a href="/" class="hover:text-primary transition-colors">Beranda</a>
+            <span>&rsaquo;</span>
+            <a href="{% url 'membership:membership' %}" class="hover:text-primary transition-colors">Keanggotaan</a>
+            <span>&rsaquo;</span>
+            <span class="text-primary font-semibold">{{ member.nama }}</span>
+        </nav>
+
+        <!-- Top Profile Card -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-stretch">
+            <!-- Left: Foto Profil -->
+            <div class="md:col-span-4 bg-surface-container border border-outline-variant rounded-2xl overflow-hidden p-2 flex items-center justify-center">
+                {% if member.foto %}
+                    <img src="{{ member.foto.url }}" alt="{{ member.nama }}" class="w-full h-[380px] object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-500">
+                {% else %}
+                    <div class="w-full h-[380px] bg-surface-container-low rounded-xl flex items-center justify-center text-on-surface/40 text-sm font-semibold">
+                        No Image Available
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Right: Info Profil -->
+            <div class="md:col-span-8 bg-surface-container border border-outline-variant rounded-2xl p-6 md:p-8 flex flex-col justify-between">
+                <div>
+                    <!-- Badge Kategori -->
+                    <span class="bg-primary-container text-on-primary-container text-[10px] font-extrabold uppercase px-3 py-1 rounded-md tracking-widest inline-block mb-4">
+                        {{ member.get_kategori_display }}
+                    </span>
+
+                    <!-- Nama & Jabatan -->
+                    <h1 class="text-2xl sm:text-4xl font-extrabold text-on-surface mb-2">
+                        {{ member.nama }}
+                    </h1>
+                    <h2 class="text-lg font-bold text-primary mb-1">
+                        {{ member.jabatan }}
+                    </h2>
+                    {% if member.nip %}
+                    <p class="text-xs text-on-surface/70 font-mono mb-6">
+                        NIP. {{ member.nip }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Detail Meta (Email & Masa Jabatan) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-outline-variant/60">
+                    <!-- Email -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider text-on-surface/50 font-bold block">Email Resmi</span>
+                            <span class="text-xs text-on-surface font-medium truncate block max-w-[200px]">
+                                {{ member.email|default:"-" }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Masa Jabatan -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider text-on-surface/50 font-bold block">Masa Jabatan</span>
+                            <span class="text-xs text-on-surface font-medium">
+                                {{ member.masa_jabatan|default:"-" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Uraian Tugas -->
+        {% if member.uraian_tugas %}
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-1 h-6 bg-primary rounded-full"></div>
+                <h3 class="text-xl font-bold text-on-surface">Uraian Tugas</h3>
+            </div>
+            <div class="prose prose-invert max-w-none text-on-surface/80 text-sm sm:text-base leading-relaxed space-y-4 whitespace-pre-line">
+                {{ member.uraian_tugas }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Section: Anggota Lainnya -->
+        {% if anggota_lainnya %}
+        <div>
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-1 h-6 bg-primary rounded-full"></div>
+                        <h3 class="text-xl font-bold text-on-surface">Anggota Lainnya</h3>
+                    </div>
+                    <p class="text-xs text-on-surface/60 mt-1 pl-4">Tim manajemen profesional UPTD Pasar Segiri</p>
+                </div>
+            </div>
+
+            <!-- Grid Anggota Lainnya -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                {% for item in anggota_lainnya %}
+                <a href="{% url 'membership:detail' item.pk %}" class="group bg-surface-container border border-outline-variant rounded-xl overflow-hidden p-3 flex flex-col hover:border-primary transition-all duration-300">
+                    <div class="w-full h-48 bg-surface-container-low rounded-lg overflow-hidden mb-3">
+                        {% if item.foto %}
+                            <img src="{{ item.foto.url }}" alt="{{ item.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-on-surface/40 text-xs">No Image</div>
+                        {% endif %}
+                    </div>
+                    <h4 class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
+                        {{ item.nama }}
+                    </h4>
+                    <p class="text-[11px] text-primary font-medium line-clamp-1">
+                        {{ item.jabatan }}
+                    </p>
+                    {% if item.nip %}
+                    <p class="text-[10px] text-on-surface/50 font-mono mt-1">
+                        NIP. {{ item.nip }}
+                    </p>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
