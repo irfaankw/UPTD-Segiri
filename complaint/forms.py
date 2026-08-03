@@ -2,6 +2,9 @@ from django import forms
 from .models import Pengaduan
 
 class PengaduanForm(forms.ModelForm):
+    # Honeypot: field jebakan buat bot, WAJIB kosong. Manusia gak akan lihat field ini.
+    website = forms.CharField(required=False, widget=forms.HiddenInput())
+
     class Meta:
         model = Pengaduan
         fields = ["nama", "telepon", "email", "kategori", "kategori_lainnya", "pesan", "lampiran"]
@@ -40,7 +43,6 @@ class PengaduanForm(forms.ModelForm):
         self.fields["kategori"].choices = Pengaduan.KATEGORI_CHOICES
         self.fields["kategori"].widget.attrs.update({"class": "peer hidden"})
 
-        # Poin #5: field teks untuk kategori "Lainnya", disembunyikan default via JS
         self.fields["kategori_lainnya"].required = False
         self.fields["kategori_lainnya"].widget.attrs.update({
             "class": base_input,
@@ -60,6 +62,13 @@ class PengaduanForm(forms.ModelForm):
             "class": "hidden",
             "id": "id_lampiran",
         })
+
+    def clean_website(self):
+        # Kalau field jebakan ini keisi, itu tandanya bot
+        value = self.cleaned_data.get("website")
+        if value:
+            raise forms.ValidationError("Terdeteksi sebagai spam.")
+        return value
 
     def clean_nama(self):
         nama = self.cleaned_data.get("nama", "").strip()

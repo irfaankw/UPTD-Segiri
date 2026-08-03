@@ -26,7 +26,7 @@
     <script src="{% static 'js/feedback.js' %}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+            const els = document.querySelectorAll('.reveal:not([data-reveal-manual]), .reveal-left, .reveal-right');
             const io = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -38,5 +38,7 @@
             els.forEach(el => io.observe(el));
         });
     </script>
+    {% block extra_scripts %}{% endblock %}
+
 </body>
 </html>

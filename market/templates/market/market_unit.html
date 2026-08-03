@@ -1,1 +1,135 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-background text-on-surface">
+
+    <!-- HERO -->
+    <section class="relative overflow-hidden pt-20 pb-12 md:pt-24 md:pb-16 px-6 text-center">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-container/45 via-surface-container-lowest to-black"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-primary-container)_0%,_transparent_55%)] opacity-50"></div>
+        <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background"></div>
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <h1 class="reveal text-4xl md:text-5xl font-bold text-on-surface tracking-tight">Daftar Unit Pasar</h1>
+            <p class="reveal mt-4 text-on-surface-variant text-lg leading-relaxed">
+                UPTD Pasar Segiri bertanggung jawab atas pengelolaan, pemeliharaan, dan peningkatan fasilitas pasar tradisional di wilayah Samarinda untuk menjamin kenyamanan transaksi antara pedagang dan masyarakat.
+            </p>
+            <div class="reveal mt-6 flex flex-wrap justify-center gap-3">
+                <span class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-primary-container rounded-full px-4 py-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3m4-14h6m-6 4h6m-6 4h4" />
+                    </svg>
+                    {{ total_pasar }} Unit Pasar
+                </span>
+                <span class="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant bg-surface-container border border-outline-variant rounded-full px-4 py-2">
+                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6-6a4 4 0 11-4-4 4 4 0 014 4z" />
+                    </svg>
+                    {{ total_pedagang }}+ Pedagang Terdaftar
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- GRID PASAR -->
+    <section class="pt-2 pb-16 px-6 max-w-6xl mx-auto">
+        <p class="reveal text-sm text-outline text-center mb-8" data-reveal-manual>
+            Pilih unit pasar di bawah untuk melihat profil, fasilitas, dan kontak pengelola.
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for pasar in daftar_pasar %}
+            <a href="{% url 'market:market_detail' pasar.slug %}" data-reveal-manual
+               class="reveal group rounded-xl overflow-hidden border border-outline-variant bg-surface-container hover:border-primary transition">
+                <div class="aspect-[4/3] overflow-hidden bg-surface-container-high">
+                    {% if pasar.foto %}
+                    <img src="{{ pasar.foto.url }}" alt="{{ pasar.nama }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-outline">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9l9-6 9 6v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9z" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-5">
+                    <h3 class="text-lg font-bold text-primary mb-1">{{ pasar.nama }}</h3>
+                    <p class="flex items-start gap-1.5 text-sm text-on-surface-variant">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0 text-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {{ pasar.alamat }}
+                    </p>
+                </div>
+            </a>
+            {% empty %}
+            <p class="col-span-full text-center text-outline py-12">Data unit pasar belum ditambahkan.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const items = Array.from(document.querySelectorAll('[data-reveal-manual]'));
+    if (!items.length) return;
+
+    function groupByRow(elements) {
+        const rows = [];
+        elements.forEach(el => {
+            const top = Math.round(el.getBoundingClientRect().top);
+            let row = rows.find(r => Math.abs(r.top - top) < 12);
+            if (!row) {
+                row = { top, els: [], revealed: false };
+                rows.push(row);
+            }
+            row.els.push(el);
+        });
+        rows.sort((a, b) => a.top - b.top);
+        return rows;
+    }
+
+    let rows = groupByRow(items);
+    let io;
+
+    function startObserving() {
+        io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const row = rows.find(r => r.els.includes(entry.target));
+                if (!row || row.revealed) return;
+                row.revealed = true;
+                row.els.forEach((el, i) => {
+                    setTimeout(() => el.classList.add('is-visible'), i * 90);
+                    io.unobserve(el);
+                });
+            });
+        }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
+
+        items.forEach(el => {
+            if (!el.classList.contains('is-visible')) io.observe(el);
+        });
+    }
+
+    startObserving();
+
+    // Regroup kalau resize (misal rotate HP atau resize window desktop),
+    // biar grouping baris tetap akurat sesuai layout terbaru
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const remaining = items.filter(el => !el.classList.contains('is-visible'));
+            if (!remaining.length) return;
+            if (io) items.forEach(el => io.unobserve(el));
+            rows = groupByRow(remaining);
+            startObserving();
+        }, 200);
+    });
+});
+</script>
+{% endblock extra_scripts %}

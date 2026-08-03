@@ -6,6 +6,12 @@ class Anggota(models.Model):
         ('staf', 'Staf & Koordinator Lapangan'),
     )
 
+    pasar = models.ForeignKey(
+        'market.Pasar', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='anggota',
+        help_text="Isi jika anggota ini adalah pengelola unit pasar tertentu. "
+                   "Kosongkan jika anggota tingkat dinas/UPTD pusat.",
+    )
     nama = models.CharField(max_length=100)
     jabatan = models.CharField(max_length=100)
     nip = models.CharField(max_length=30, blank=True, null=True)

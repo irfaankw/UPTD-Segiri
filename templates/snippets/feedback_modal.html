@@ -22,6 +22,11 @@
               enctype="multipart/form-data" class="space-y-5" novalidate>
             {% csrf_token %}
 
+            <div class="absolute -left-[9999px]" aria-hidden="true">
+                <label for="id_website">Jangan isi field ini</label>
+                {{ pengaduan_form.website }}
+            </div>
+
             <div>
                 <label class="block text-sm font-semibold text-on-surface mb-1.5">
                     Nama Lengkap <span class="text-outline font-normal">(Kosongkan untuk mengirim sebagai Anonim)</span>
