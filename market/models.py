@@ -1,6 +1,18 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.utils.text import slugify
-from urllib.parse import urlparse, parse_qs
+
+
+def validate_video_size(file):
+    """Batasi ukuran video maks 45MB (buffer aman dari limit bucket Supabase 50MB)."""
+    max_mb = 45
+    if file.size > max_mb * 1024 * 1024:
+        raise ValidationError(
+            f"Ukuran video maksimal {max_mb}MB (sekarang {file.size / 1024 / 1024:.1f}MB). "
+            "Kompres dulu pakai HandBrake atau ffmpeg sebelum upload."
+        )
+
 
 class Pasar(models.Model):
     KELAS_CHOICES = [
@@ -26,10 +38,22 @@ class Pasar(models.Model):
 
     # --- Bagian baru untuk market_detail.html ---
 
-    video_youtube_url = models.URLField(
-        blank=True,
-        help_text="Tempel URL video YouTube (contoh: https://www.youtube.com/watch?v=XXXXXXXXXXX). "
-                   "Kosongkan jika belum ada video profil pasar ini.",
+    video_profil = models.FileField(
+        upload_to="market/video/",
+        blank=True, null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=["mp4", "webm"]),
+            validate_video_size,
+        ],
+        help_text="Upload video profil pasar ini (format MP4/WebM, maks 45MB). "
+                   "Kompres dulu ke H.264 720p pakai HandBrake/ffmpeg sebelum upload. "
+                   "Kosongkan jika belum ada video.",
+    )
+    video_thumbnail = models.ImageField(
+        upload_to="market/video_thumbnail/",
+        blank=True, null=True,
+        help_text="Foto poster/thumbnail video (ditampilkan sebelum user klik play). "
+                   "Jika kosong, akan pakai foto utama pasar sebagai fallback.",
     )
 
     sejarah_fungsi = models.TextField(
@@ -65,28 +89,6 @@ class Pasar(models.Model):
     def __str__(self):
         return self.nama
 
-    @property
-    def youtube_video_id(self):
-        """Ekstrak video ID dari berbagai format URL YouTube."""
-        if not self.video_youtube_url:
-            return ""
-        try:
-            parsed = urlparse(self.video_youtube_url)
-            host = parsed.netloc.lower().replace("www.", "").replace("m.", "")
-
-            if host == "youtu.be":
-                return parsed.path.lstrip("/").split("/")[0]
-
-            if "youtube.com" in host:
-                if parsed.path == "/watch":
-                    video_id = parse_qs(parsed.query).get("v", [""])[0]
-                    return video_id
-                for prefix in ("/embed/", "/shorts/", "/live/"):
-                    if parsed.path.startswith(prefix):
-                        return parsed.path[len(prefix):].split("/")[0]
-        except Exception:
-            return ""
-        return ""
 
 class FotoAktivitasPasar(models.Model):
     pasar = models.ForeignKey(Pasar, on_delete=models.CASCADE, related_name="foto_aktivitas")
@@ -102,6 +104,7 @@ class FotoAktivitasPasar(models.Model):
     def __str__(self):
         return f"{self.pasar.nama} - Foto #{self.urutan}"
 
+
 class SaranaFasilitas(models.Model):
     pasar = models.ForeignKey(Pasar, on_delete=models.CASCADE, related_name="sarana_fasilitas")
     nama = models.CharField(max_length=100)
@@ -114,6 +117,7 @@ class SaranaFasilitas(models.Model):
 
     def __str__(self):
         return f"{self.pasar.nama} - {self.nama}"
+
 
 class KomoditasUnggulan(models.Model):
     pasar = models.ForeignKey(Pasar, on_delete=models.CASCADE, related_name="komoditas_unggulan")

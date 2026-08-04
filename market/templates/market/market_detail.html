@@ -3,7 +3,7 @@
 
 {% block content %}
 <style>
-    /* Scrollbar custom untuk modal, ikut tema situs (bukan putih default browser) */
+    /* Scrollbar custom untuk modal */
     .custom-scroll::-webkit-scrollbar { width: 8px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
     .custom-scroll::-webkit-scrollbar-thumb { background-color: var(--color-outline-variant); border-radius: 9999px; }
@@ -32,14 +32,20 @@
 
             <!-- CARD VIDEO / HERO -->
             <div class="reveal rounded-xl overflow-hidden border border-outline-variant bg-surface-container">
-                <div class="relative aspect-video bg-surface-container-high" id="video-wrapper">
-                    {% if pasar.video_youtube_url and pasar.youtube_video_id %}
+                <div id="video-wrapper" class="relative aspect-video bg-surface-container-high">
+                    {% if pasar.video_profil %}
                     <button type="button" id="video-play-btn"
-                            class="group absolute inset-0 w-full h-full"
+                            class="group block absolute inset-0 w-full h-full cursor-pointer"
                             aria-label="Putar video profil {{ pasar.nama }}">
-                        <img src="https://img.youtube.com/vi/{{ pasar.youtube_video_id }}/hqdefault.jpg"
-                             alt="Thumbnail video {{ pasar.nama }}"
-                             class="w-full h-full object-cover">
+                        {% if pasar.video_thumbnail %}
+                        <img src="{{ pasar.video_thumbnail.url }}" alt="Thumbnail video {{ pasar.nama }}"
+                            class="w-full h-full object-cover">
+                        {% elif pasar.foto %}
+                        <img src="{{ pasar.foto.url }}" alt="Thumbnail video {{ pasar.nama }}"
+                            class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-surface-container-high"></div>
+                        {% endif %}
                         <span class="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition"></span>
                         <span class="absolute inset-0 flex items-center justify-center">
                             <span class="w-16 h-16 rounded-full bg-primary-container/90 flex items-center justify-center group-hover:scale-110 transition shadow-lg">
@@ -47,6 +53,9 @@
                                     <path d="M8 5v14l11-7z" />
                                 </svg>
                             </span>
+                        </span>
+                        <span class="absolute bottom-3 right-3 text-xs font-semibold text-white bg-black/60 rounded-full px-3 py-1">
+                            Putar Video Profil
                         </span>
                     </button>
                     {% elif pasar.foto %}
@@ -401,18 +410,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Lazy-load video YouTube: klik thumbnail baru inject iframe ---
+    // --- Lazy-load video offline: klik thumbnail baru inject <video> ---
+    {% if pasar.video_profil %}
     const playBtn = document.getElementById('video-play-btn');
     if (playBtn) {
         playBtn.addEventListener('click', () => {
             const wrapper = document.getElementById('video-wrapper');
-            const videoId = "{{ pasar.youtube_video_id|escapejs }}";
-            wrapper.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-                title="Video {{ pasar.nama|escapejs }}" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>`;
+            const videoUrl = "{{ pasar.video_profil.url|escapejs }}";
+            wrapper.innerHTML = `<video class="w-full h-full object-cover" src="${videoUrl}"
+                controls autoplay playsinline>
+                Browser kamu tidak mendukung pemutaran video.
+            </video>`;
         });
     }
+    {% endif %}
 
     // --- Carousel galeri "Aktivitas Pasar" ---
     const galeriData = [

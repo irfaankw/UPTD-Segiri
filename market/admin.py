@@ -28,19 +28,8 @@ class PasarAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("nama",)}
     search_fields = ["nama", "alamat"]
 
-    fieldsets = (
-        ("Informasi Dasar", {
-            "fields": ("nama", "slug", "alamat", "foto", "kelas", "jam_operasional", "jumlah_pedagang", "urutan")
+    ("Konten Halaman Detail", {
+            "fields": ("deskripsi", "video_profil", "video_thumbnail", "sejarah_fungsi", "ekosistem_pedagang")
         }),
-        ("Konten Halaman Detail", {
-            "fields": ("deskripsi", "video_youtube_url", "sejarah_fungsi", "ekosistem_pedagang")
-        }),
-        ("Lokasi", {
-            "fields": ("google_maps_embed_url", "google_maps_link")
-        }),
-        ("Struktur Organisasi", {
-            "fields": ("struktur_organisasi_image",)
-        }),
-    )
 
     inlines = [FotoAktivitasInline, SaranaFasilitasInline, KomoditasUnggulanInline, DokumenResmiInline]
