@@ -1,7 +1,295 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <h1 class="text-2xl font-bold">Galeri</h1>
+
+<!-- Styles untuk Render Gambar & Animasi Scroll In/Out -->
+<style>
+    /* Optimalisasi Render Gambar agar Tajam */
+    .gallery-img {
+        image-rendering: -webkit-optimize-contrast;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+        will-change: transform;
+    }
+
+    /* Target Animasi Pop-Up (Kondisi Awal: Tersembunyi) */
+    .gallery-card-item {
+        opacity: 0;
+        transform: translateY(32px) scale(0.92);
+        transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.3s ease,
+                    border-color 0.3s ease;
+        will-change: opacity, transform;
+    }
+
+    /* Kondisi Aktif saat Masuk Frame / Viewport */
+    .gallery-card-item.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        transition-delay: calc(var(--delay, 0) * 80ms);
+    }
+
+    /* Hover State (Hanya aktif jika sudah masuk frame) */
+    .gallery-card-item.is-visible:hover {
+        transform: translateY(-6px) scale(1.02);
+        transition-delay: 0ms !important;
+    }
+
+    /* Smooth Transition Modal */
+    #galleryModal {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s ease;
+    }
+
+    #galleryModal.is-open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #galleryModal .modal-card {
+        transform: scale(0.92) translateY(16px);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #galleryModal.is-open .modal-card {
+        transform: scale(1) translateY(0);
+    }
+</style>
+
+<!-- Hero Header -->
+<section class="relative overflow-hidden py-12 md:py-24 px-4 text-center">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary-container/45 via-surface-container-lowest to-black"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-primary-container)_0%,_transparent_55%)] opacity-50"></div>
+    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-background"></div>
+    <div class="relative z-10">
+        <h1 class="reveal text-2xl md:text-5xl font-bold text-on-surface tracking-tight">Galeri Foto</h1>
+        <p class="reveal mt-2 md:mt-3 text-on-surface-variant text-xs md:text-lg max-w-xl mx-auto">
+            Dokumentasi kebersamaan dan kegiatan di lingkungan UPTD Pasar Segiri Kota Samarinda
+        </p>
+    </div>
+</section>
+
+<div class="max-w-5xl mx-auto px-1.5 sm:px-6 pb-16">
+
+    <!-- Tab Filter Kategori -->
+    <div class="flex justify-center border-b border-[var(--color-outline-variant)]/40 mb-6 md:mb-10">
+        <a href="?kategori=kebersamaan" 
+           class="flex items-center space-x-1.5 sm:space-x-2 py-2.5 px-4 sm:px-6 font-semibold text-[11px] sm:text-sm tracking-wider uppercase border-b-2 transition-all duration-300 ease-out {% if kategori_selected == 'kebersamaan' or not kategori_selected %}border-[var(--color-primary)] text-[var(--color-primary)]{% else %}border-transparent text-[var(--color-secondary)] hover:text-[var(--color-on-surface)]{% endif %}">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span>Kebersamaan</span>
+        </a>
+        <a href="?kategori=kegiatan" 
+           class="flex items-center space-x-1.5 sm:space-x-2 py-2.5 px-4 sm:px-6 font-semibold text-[11px] sm:text-sm tracking-wider uppercase border-b-2 transition-all duration-300 ease-out {% if kategori_selected == 'kegiatan' %}border-[var(--color-primary)] text-[var(--color-primary)]{% else %}border-transparent text-[var(--color-secondary)] hover:text-[var(--color-on-surface)]{% endif %}">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <span>Kegiatan</span>
+        </a>
+    </div>
+
+    <!-- Grid Foto Style Instagram (Selalu 3 Kolom) -->
+    <div class="grid grid-cols-3 gap-1.5 sm:gap-4 md:gap-6">
+        {% for item in page_obj %}
+        <div onclick="openGalleryModal('{{ item.foto.url }}', '{{ item.judul|escapejs }}', '{{ item.tanggal|date:"d F Y" }}', '{{ item.get_kategori_display|escapejs }}', '{{ item.keterangan|default:""|escapejs }}')"
+             class="gallery-card-item group relative aspect-square bg-[var(--color-surface-container-low)] rounded-lg sm:rounded-2xl overflow-hidden border border-[var(--color-outline-variant)]/40 shadow-sm sm:shadow-md hover:shadow-2xl hover:border-[var(--color-primary)]/50 cursor-pointer">
+            
+            <!-- Foto dengan Efek Zoom -->
+            <div class="w-full h-full overflow-hidden relative">
+                <img src="{{ item.foto.url }}" alt="{{ item.judul }}" 
+                     class="gallery-img w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110">
+            </div>
+
+            <!-- Overlay Details saat Hover -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out flex flex-col justify-end p-2 sm:p-5 text-white backdrop-blur-[2px]">
+                
+                <span class="w-max px-1.5 sm:px-2.5 py-0.5 mb-1 sm:mb-2 text-[8px] sm:text-[10px] font-bold tracking-wider uppercase rounded-full bg-[var(--color-primary)]/90 text-white shadow-sm transform translate-y-3 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                    {{ item.get_kategori_display }}
+                </span>
+
+                <p class="font-bold text-[10px] sm:text-base line-clamp-1 drop-shadow-md transform translate-y-3 group-hover:translate-y-0 transition-transform duration-300 ease-out delay-75">
+                    {{ item.judul }}
+                </p>
+
+                {% if item.keterangan %}
+                    <p class="hidden sm:block text-xs text-gray-300 line-clamp-2 mt-1 transform translate-y-3 group-hover:translate-y-0 transition-transform duration-300 ease-out delay-100">
+                        {{ item.keterangan }}
+                    </p>
+                {% endif %}
+
+                <div class="flex items-center text-[9px] sm:text-[11px] text-gray-400 mt-0.5 sm:mt-2 font-medium transform translate-y-3 group-hover:translate-y-0 transition-transform duration-300 ease-out delay-150">
+                    <svg class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 mr-1 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="truncate">{{ item.tanggal|date:"d M Y" }}</span>
+                </div>
+            </div>
+
+            <!-- Indicator Hover Icon -->
+            <div class="absolute top-1.5 right-1.5 sm:top-3 sm:right-3 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-16 bg-[var(--color-surface-container-low)] rounded-2xl border border-[var(--color-outline-variant)]">
+            <p class="text-[var(--color-secondary)] text-sm">Belum ada foto dalam kategori ini.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navigasi Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center items-center space-x-1.5 mt-8 sm:mt-12">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&kategori={{ kategori_selected }}" 
+               class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] rounded-xl text-xs sm:text-sm hover:bg-[var(--color-primary)] hover:text-white transition-all">
+                &laquo;
+            </a>
+        {% endif %}
+
+        {% for i in custom_page_range %}
+            {% if page_obj.number == i %}
+                <span class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[var(--color-primary)] text-white font-bold rounded-xl text-xs sm:text-sm shadow-md">
+                    {{ i }}
+                </span>
+            {% else %}
+                <a href="?page={{ i }}&kategori={{ kategori_selected }}" 
+                   class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] rounded-xl text-xs sm:text-sm hover:bg-[var(--color-surface-container-high)] transition-all">
+                    {{ i }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&kategori={{ kategori_selected }}" 
+               class="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] rounded-xl text-xs sm:text-sm hover:bg-[var(--color-primary)] hover:text-white transition-all">
+                &raquo;
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
 </div>
-{% endblock content %}
+
+<!-- ===== MODAL POP-UP DETAIL FOTO ===== -->
+<div id="galleryModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md" onclick="closeGalleryModalOnOutside(event)">
+    <div class="modal-card relative bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)]/60 rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[85vh] md:max-h-[80vh]">
+        
+        <!-- Area Gambar Modal -->
+        <div class="w-full md:w-8/12 bg-black flex items-center justify-center min-h-[280px] md:min-h-[480px] p-3">
+            <img id="modalImg" src="" alt="" class="max-h-[50vh] md:max-h-[75vh] w-full object-contain rounded-xl">
+        </div>
+
+        <!-- Area Detail Info -->
+        <div class="w-full md:w-4/12 p-6 flex flex-col justify-between overflow-y-auto custom-scroll bg-[var(--color-surface-container)]">
+            <div>
+                <div class="flex items-start justify-between gap-3 pb-4 mb-4 border-b border-[var(--color-outline-variant)]/40">
+                    <div class="flex flex-col gap-2">
+                        <span id="modalKategori" class="w-max px-3 py-1 text-[11px] font-bold tracking-wider uppercase rounded-full bg-[var(--color-primary-container)] text-white shadow-sm"></span>
+                        <div class="flex items-center text-xs text-[var(--color-secondary)] font-medium">
+                            <svg class="w-3.5 h-3.5 mr-1 text-[var(--color-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span id="modalTanggal"></span>
+                        </div>
+                    </div>
+
+                    <button onclick="closeGalleryModal()" class="shrink-0 w-8 h-8 flex items-center justify-center bg-[var(--color-surface-container-high)] hover:bg-[var(--color-primary-container)] text-[var(--color-on-surface)] hover:text-white rounded-full transition-colors duration-200">
+                        &times;
+                    </button>
+                </div>
+
+                <h3 id="modalJudul" class="text-lg md:text-xl font-bold text-[var(--color-on-surface)] mb-3 leading-snug"></h3>
+                <p id="modalKeterangan" class="text-sm text-[var(--color-secondary)] whitespace-pre-line leading-relaxed"></p>
+            </div>
+
+            <div class="pt-4 mt-6 border-t border-[var(--color-outline-variant)]/30 text-xs text-[var(--color-outline)] font-medium flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[var(--color-primary)]"></span>
+                UPTD Pasar Segiri Samarinda
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Script IntersectionObserver & Modal Control -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.gallery-card-item');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -30px 0px',
+            threshold: 0.1
+        };
+
+        let delayCounter = 0;
+        let delayResetTimeout;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.setProperty('--delay', delayCounter);
+                    entry.target.classList.add('is-visible');
+                    delayCounter++;
+
+                    clearTimeout(delayResetTimeout);
+                    delayResetTimeout = setTimeout(() => {
+                        delayCounter = 0;
+                    }, 150);
+
+                } else {
+                    entry.target.classList.remove('is-visible');
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach((card) => observer.observe(card));
+    });
+
+    // Modal Script
+    function openGalleryModal(imgUrl, judul, tanggal, kategori, keterangan) {
+        document.getElementById('modalImg').src = imgUrl;
+        document.getElementById('modalJudul').innerText = judul;
+        document.getElementById('modalTanggal').innerText = tanggal;
+        document.getElementById('modalKategori').innerText = kategori;
+        
+        const ketElement = document.getElementById('modalKeterangan');
+        if (keterangan && keterangan.trim() !== '') {
+            ketElement.innerText = keterangan;
+        } else {
+            ketElement.innerText = 'Tidak ada keterangan tambahan.';
+        }
+
+        const modal = document.getElementById('galleryModal');
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeGalleryModal() {
+        const modal = document.getElementById('galleryModal');
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+    }
+
+    function closeGalleryModalOnOutside(event) {
+        if (event.target.id === 'galleryModal') {
+            closeGalleryModal();
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeGalleryModal();
+        }
+    });
+</script>
+
+{% endblock %}

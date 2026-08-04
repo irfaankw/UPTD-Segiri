@@ -66,3 +66,25 @@ class MisiUPTD(models.Model):
 
     def __str__(self):
         return f"{self.urutan}. {self.isi[:50]}"
+
+
+# --- MODEL BARU: GALERI ---
+class Galeri(models.Model):
+    KATEGORI_CHOICES = [
+        ('kebersamaan', 'Kebersamaan'),
+        ('kegiatan', 'Kegiatan'),
+    ]
+
+    judul = models.CharField(max_length=200, help_text="Judul singkat foto")
+    kategori = models.CharField(max_length=20, choices=KATEGORI_CHOICES)
+    foto = models.ImageField(upload_to='galeri/')
+    keterangan = models.TextField(blank=True, null=True)
+    tanggal = models.DateField()
+
+    class Meta:
+        ordering = ['-tanggal']
+        verbose_name = "Galeri"
+        verbose_name_plural = "Galeri"
+
+    def __str__(self):
+        return f"{self.judul} - {self.get_kategori_display()}"

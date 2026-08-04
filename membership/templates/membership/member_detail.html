@@ -15,10 +15,10 @@
 
         <!-- Top Profile Card -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-stretch">
-            <!-- Left: Foto Profil -->
+            <!-- Left: Foto Profil (Full Color) -->
             <div class="md:col-span-4 bg-surface-container border border-outline-variant rounded-2xl overflow-hidden p-2 flex items-center justify-center">
                 {% if member.foto %}
-                    <img src="{{ member.foto.url }}" alt="{{ member.nama }}" class="w-full h-[380px] object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-500">
+                    <img src="{{ member.foto.url }}" alt="{{ member.nama }}" class="w-full h-[380px] object-cover rounded-xl hover:scale-105 transition-transform duration-500">
                 {% else %}
                     <div class="w-full h-[380px] bg-surface-container-low rounded-xl flex items-center justify-center text-on-surface/40 text-sm font-semibold">
                         No Image Available
@@ -111,7 +111,7 @@
                 <a href="{% url 'membership:detail' item.pk %}" class="group bg-surface-container border border-outline-variant rounded-xl overflow-hidden p-3 flex flex-col hover:border-primary transition-all duration-300">
                     <div class="w-full h-48 bg-surface-container-low rounded-lg overflow-hidden mb-3">
                         {% if item.foto %}
-                            <img src="{{ item.foto.url }}" alt="{{ item.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300">
+                            <img src="{{ item.foto.url }}" alt="{{ item.nama }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                         {% else %}
                             <div class="w-full h-full flex items-center justify-center text-on-surface/40 text-xs">No Image</div>
                         {% endif %}

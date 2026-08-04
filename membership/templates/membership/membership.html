@@ -1,11 +1,71 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="bg-surface text-on-surface min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+<style>
+    /* Keyframes Animasi Diperhalus */
+    @keyframes slideFromLeft {
+        0% { 
+            opacity: 0; 
+            transform: translateX(-120px); 
+            filter: blur(4px);
+        }
+        100% { 
+            opacity: 1; 
+            transform: translateX(0); 
+            filter: blur(0);
+        }
+    }
+    
+    @keyframes slideFromRight {
+        0% { 
+            opacity: 0; 
+            transform: translateX(120px); 
+            filter: blur(4px);
+        }
+        100% { 
+            opacity: 1; 
+            transform: translateX(0); 
+            filter: blur(0);
+        }
+    }
+    
+    @keyframes smoothPopUp {
+        0% { 
+            opacity: 0; 
+            transform: scale(0.85) translateY(40px); 
+            filter: blur(2px);
+        }
+        100% { 
+            opacity: 1; 
+            transform: scale(1) translateY(0); 
+            filter: blur(0);
+        }
+    }
+
+    /* Helper Classes untuk Animasi Scroll (Durasi Diperlambat menjadi 1.4s dan 1.1s) */
+    .animate-pimpinan-left {
+        animation: slideFromLeft 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .animate-pimpinan-right {
+        animation: slideFromRight 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .animate-pop-up {
+        animation: smoothPopUp 1.1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    /* Menyembunyikan elemen sebelum terdeteksi scroll */
+    .scroll-hide {
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, opacity, filter;
+    }
+</style>
+
+<div class="bg-surface text-on-surface min-h-screen py-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
     <div class="max-w-6xl mx-auto">
         
         <!-- Header Section -->
-        <div class="text-center max-w-2xl mx-auto mb-12">
+        <div class="text-center max-w-2xl mx-auto mb-12 scroll-hide scroll-animate-popup">
             <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-on-surface mb-3">
                 Struktur Keanggotaan
             </h1>
@@ -24,11 +84,13 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% for p in pimpinan_list %}
-                <a href="{% url 'membership:detail' p.pk %}" class="group bg-surface-container border border-outline-variant rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start shadow-md hover:border-primary transition-all duration-300">
-                    <!-- Foto -->
+                <a href="{% url 'membership:detail' p.pk %}" 
+                   class="group bg-surface-container border border-outline-variant rounded-2xl p-5 flex flex-col sm:flex-row gap-5 items-center sm:items-start shadow-md hover:border-primary transition-all duration-300 scroll-hide {% if forloop.first %}scroll-animate-left{% else %}scroll-animate-right{% endif %}">
+                    
+                    <!-- Foto Pimpinan (Langsung Berwarna) -->
                     <div class="w-32 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant flex items-center justify-center">
                         {% if p.foto %}
-                            <img src="{{ p.foto.url }}" alt="{{ p.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                            <img src="{{ p.foto.url }}" alt="{{ p.nama }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         {% else %}
                             <span class="text-on-surface/50 text-xs font-semibold">No Image</span>
                         {% endif %}
@@ -75,11 +137,14 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
                 {% for staf in staf_list %}
-                <a href="{% url 'membership:detail' staf.pk %}" class="flex flex-col items-center text-center group">
-                    <!-- Foto Bulat -->
-                    <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container-low mb-4 shadow-md group-hover:border-primary transition-all duration-300 flex items-center justify-center">
+                <a href="{% url 'membership:detail' staf.pk %}" 
+                   class="flex flex-col items-center text-center group scroll-hide scroll-animate-popup"
+                   style="--staf-index: {{ forloop.counter0 }};">
+                    
+                    <!-- Foto Bulat (Langsung Berwarna) -->
+                    <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container-low mb-4 shadow-md group-hover:border-primary group-hover:scale-105 transition-all duration-300 flex items-center justify-center">
                         {% if staf.foto %}
-                            <img src="{{ staf.foto.url }}" alt="{{ staf.nama }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                            <img src="{{ staf.foto.url }}" alt="{{ staf.nama }}" class="w-full h-full object-cover">
                         {% else %}
                             <span class="text-on-surface/50 text-xs font-semibold">No Image</span>
                         {% endif %}
@@ -100,4 +165,45 @@
 
     </div>
 </div>
+
+<script>
+    /* JAVASCRIPT ANIMASI SCROLL HALUS & BERULANG */
+    document.addEventListener("DOMContentLoaded", function () {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -50px 0px', // Memberikan sedikit margin bawah agar memicu animasi lebih tepat waktu
+            threshold: 0.1
+        };
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Berikan sedikit delay berurutan (stagger) untuk item staf
+                    if (entry.target.style.getPropertyValue('--staf-index')) {
+                        const index = entry.target.style.getPropertyValue('--staf-index');
+                        entry.target.style.animationDelay = `${index * 0.15}s`;
+                    }
+
+                    entry.target.classList.remove('scroll-hide');
+
+                    if (entry.target.classList.contains('scroll-animate-left')) {
+                        entry.target.classList.add('animate-pimpinan-left');
+                    } else if (entry.target.classList.contains('scroll-animate-right')) {
+                        entry.target.classList.add('animate-pimpinan-right');
+                    } else if (entry.target.classList.contains('scroll-animate-popup')) {
+                        entry.target.classList.add('animate-pop-up');
+                    }
+                } else {
+                    // Reset saat keluar layar agar animasi terulang kembali
+                    entry.target.classList.add('scroll-hide');
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.classList.remove('animate-pimpinan-left', 'animate-pimpinan-right', 'animate-pop-up');
+                }
+            });
+        }, observerOptions);
+
+        const animatedElements = document.querySelectorAll('.scroll-animate-left, .scroll-animate-right, .scroll-animate-popup');
+        animatedElements.forEach(el => scrollObserver.observe(el));
+    });
+</script>
 {% endblock %}
