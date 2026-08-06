@@ -1,22 +1,552 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold text-green-600 mb-2">
-            ✅ Tailwind Berhasil!
-        </h1>
-        <p class="text-gray-600 mb-6">
-            Konfigurasi Tailwind CSS di project UPTD Pasar Segiri sudah jalan dengan baik.
-        </p>
-        <div class="flex gap-3 justify-center">
-            <span class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-                Django
-            </span>
-            <span class="px-4 py-2 bg-cyan-500 text-white rounded-lg text-sm font-medium">
-                Tailwind CSS
-            </span>
+<!-- Mengimpor Font Modern Clean (Plus Jakarta Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+<style>
+    .font-sans-clean {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+</style>
+
+<div class="bg-[#121212] min-h-screen text-white font-sans-clean tracking-tight">
+
+    <!-- ========================================== -->
+    <!-- HERO CAROUSEL SECTION (FIXED HEIGHT 600PX) -->
+    <!-- ========================================== -->
+    <section class="relative w-full h-[500px] md:h-[600px] border-b border-zinc-800 bg-zinc-900 overflow-hidden">
+        <div id="heroCarousel" class="relative w-full h-full">
+            
+            <!-- Wrapper Slide -->
+            <div class="carousel-inner flex h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+
+                <!-- SLIDE 1: DINAMIS (BANNERS DATABASE) -->
+                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center">
+                    {% if hero_banner and hero_banner.gambar %}
+                        <img src="{{ hero_banner.gambar.url }}" class="absolute inset-0 w-full h-full object-cover object-center" alt="Hero Banner Utama">
+                    {% else %}
+                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-red-950 via-zinc-900 to-black"></div>
+                    {% endif %}
+                </div>
+
+                <!-- SLIDE 2: PROFIL UPTD -->
+                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Suasana Gedung dan Area Pasar">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
+
+                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
+                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                                Tentang Kami
+                            </span>
+                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                                Profil UPTD Pasar Segiri
+                            </h2>
+                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
+                                Pelajari visi, misi, bagan struktur organisasi, serta jam operasional layanan publik di lingkungan UPTD Pasar Segiri.
+                            </p>
+                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
+                                <a href="{% url 'core:uptd_profile' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
+                                    Lihat Profil UPTD
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 3: UNIT PASAR -->
+                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Lapak Pedagang Pasar Tradisional">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
+
+                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
+                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                                Pengelolaan Wilayah
+                            </span>
+                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                                Unit-Unit Pasar Tradisional
+                            </h2>
+                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
+                                Informasi lengkap unit pasar di bawah naungan UPTD, mulai dari persebaran lokasi, kapasitas lapak, hingga fasilitas pendukung.
+                            </p>
+                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
+                                <a href="{% url 'market:market_unit' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
+                                    Lihat Unit Pasar
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 4: KEANGGOTAAN -->
+                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Aktivitas Pedagang Pasar">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
+
+                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
+                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                                Sumber Daya Manusia
+                            </span>
+                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                                Staf & Keanggotaan
+                            </h2>
+                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
+                                Mengenal jajaran pimpinan, koordinator lapangan, serta staf operasional yang berdedikasi melayani aktivitas pasar harian.
+                            </p>
+                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
+                                <a href="{% url 'membership:membership' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
+                                    Lihat Keanggotaan
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 5: GALERI -->
+                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Dokumentasi Produk Pasar">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
+
+                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
+                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                                Dokumentasi
+                            </span>
+                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                                Galeri Kegiatan & Kebersamaan
+                            </h2>
+                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
+                                Kumpulan foto dokumentasi berbagai agenda resmi, kegiatan penataan pasar, dan momen kebersamaan di lingkungan UPTD.
+                            </p>
+                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
+                                <a href="{% url 'core:gallery' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
+                                    Buka Galeri Foto
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Navigasi Carousel -->
+            <button id="prevBtn" aria-label="Slide Sebelumnya" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-20">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <button id="nextBtn" aria-label="Slide Selanjutnya" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-20">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+
+            <!-- Indicator Bullets (Generated Dinamis via JS) -->
+            <div id="carouselIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20"></div>
+
         </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: PROFIL PIMPINAN                -->
+    <!-- ========================================== -->
+    <section class="relative bg-gradient-to-b from-[#180a0a] via-[#2a0c0c] to-[#121212] py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-zinc-800/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+                <h2 class="text-base sm:text-xl font-bold tracking-widest text-white uppercase flex flex-col items-center gap-2">
+                    <span>PROFIL PIMPINAN UPTD</span>
+                    <span class="w-12 sm:w-16 h-0.5 bg-rose-400 rounded-full"></span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-5xl mx-auto">
+                {% for pimpinan in pimpinan_list %}
+                    <div class="bg-[#1a1a1a]/90 border border-zinc-800 rounded-xl p-3.5 sm:p-5 shadow-xl backdrop-blur-md flex items-center gap-3.5 sm:gap-5">
+                        <div class="pr-3.5 sm:pr-5 border-r border-zinc-700/60 shrink-0">
+                            <!-- UKURAN FOTO SERAGAM (28x32 / 112px x 128px) -->
+                            <div class="w-24 h-28 sm:w-28 sm:h-32 rounded-md overflow-hidden bg-zinc-800 shrink-0">
+                                {% if pimpinan.foto %}
+                                    <img src="{{ pimpinan.foto.url }}" alt="{{ pimpinan.nama }}" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-300">
+                                {% else %}
+                                    <img src="{% static 'images/default-avatar.png' %}" alt="{{ pimpinan.nama }}" class="w-full h-full object-cover object-top">
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0 space-y-1">
+                            <h3 class="text-sm sm:text-lg font-bold text-rose-300 truncate leading-snug">
+                                {{ pimpinan.nama }}
+                            </h3>
+                            <p class="text-[10px] sm:text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                                {{ pimpinan.jabatan }}
+                            </p>
+                            {% if pimpinan.nip %}
+                                <p class="text-[9px] sm:text-[10px] text-zinc-500 font-mono">
+                                    NIP. {{ pimpinan.nip }}
+                                </p>
+                            {% endif %}
+                            <div class="pt-1 text-zinc-400 text-[10px] sm:text-xs leading-relaxed font-normal">
+                                {% if pimpinan.sambutan_singkat %}
+                                    <p class="line-clamp-3 italic">"{{ pimpinan.sambutan_singkat }}"</p>
+                                {% elif forloop.first and profil and profil.sambutan_isi %}
+                                    <p class="line-clamp-3 italic">"{{ profil.sambutan_isi }}"</p>
+                                {% else %}
+                                    <p class="line-clamp-3">Bertanggung jawab dalam koordinasi operasional dan strategi pengembangan pasar tradisional di wilayah Samarinda.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-span-full text-center py-8 sm:py-10 bg-zinc-900/40 rounded-xl border border-zinc-800">
+                        <p class="text-gray-400 text-xs">Belum ada data pimpinan di sistem.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: UNIT PASAR WILAYAH             -->
+    <!-- ========================================== -->
+    <section class="bg-[#121212] py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b-2 border-zinc-800">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-end mb-8 sm:mb-12">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center gap-2">
+                        <span>Unit Pasar Wilayah</span>
+                        <span class="inline-block w-2 sm:w-2.5 h-2 sm:h-2.5 bg-gradient-to-r from-red-600 to-rose-500 shadow-[0_0_12px_rgba(225,29,72,0.9)]"></span>
+                    </h2>
+                    <p class="text-zinc-400 text-[11px] sm:text-sm mt-1 font-normal">Daftar pasar tradisional di bawah naungan UPTD Segiri.</p>
+                </div>
+                <a href="{% url 'market:market_unit' %}" class="text-[11px] sm:text-sm text-zinc-300 hover:text-rose-400 font-medium flex items-center gap-1.5 shrink-0 transition group">
+                    <span>Lihat Semua</span>
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 sm:gap-x-10 sm:gap-y-16 pt-4 sm:pt-6">
+                {% for pasar in unit_pasar_list %}
+                    <a href="{% url 'market:market_detail' pasar.slug %}" class="group relative flex flex-col items-start w-full">
+                        
+                        <!-- SERAGAM: BOX GAMBAR UNIT PASAR TINGGI FIX 220PX -->
+                        <div class="w-[92%] h-[200px] sm:h-[220px] rounded-none overflow-hidden bg-zinc-900 relative z-10 -mb-10 sm:-mb-12 p-[2px] bg-gradient-to-r from-zinc-600 via-zinc-700 to-zinc-600 group-hover:from-red-600 group-hover:via-rose-500 group-hover:to-orange-500 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.8)] group-hover:shadow-[0_0_25px_rgba(225,29,72,0.5)] transition-all duration-300 group-hover:-translate-y-1.5">
+                            <div class="w-full h-full bg-zinc-900 overflow-hidden relative">
+                                {% if pasar.foto %}
+                                    <img src="{{ pasar.foto.url }}" alt="{{ pasar.nama }}" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105">
+                                {% else %}
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-zinc-500 bg-zinc-800">
+                                        <svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9l9-6 9 6v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9z" />
+                                        </svg>
+                                        <span class="text-[9px] sm:text-[10px]">Foto belum tersedia</span>
+                                    </div>
+                                {% endif %}
+
+                                <div class="absolute top-0 right-0 bg-zinc-900 text-zinc-300 font-bold text-[10px] sm:text-[11px] font-mono px-2 py-0.5 sm:px-2.5 sm:py-1 border-l-2 border-b-2 border-zinc-700 group-hover:border-rose-500 group-hover:text-rose-400 transition-colors">
+                                    {% if forloop.counter < 10 %}0{% endif %}{{ forloop.counter }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SERAGAM: CARD BODY PASAR TINGGI FIX 220PX -->
+                        <div class="w-[92%] ml-auto p-[2px] bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-800 group-hover:from-red-600 group-hover:via-rose-600 group-hover:to-orange-500 shadow-[0_20px_35px_-15px_rgba(0,0,0,0.9)] group-hover:shadow-[0_0_30px_rgba(225,29,72,0.35)] transition-all duration-300">
+                            <div class="w-full h-[220px] bg-[#181818] pt-14 sm:pt-16 pb-5 sm:pb-6 px-5 sm:px-6 flex flex-col justify-between relative">
+                                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 shadow-[0_0_15px_rgba(225,29,72,0.9)]"></div>
+
+                                <div class="space-y-1.5 sm:space-y-2 relative z-10">
+                                    <h3 class="text-base sm:text-lg font-bold text-[#FF6B6B] group-hover:text-rose-300 transition leading-snug line-clamp-1">
+                                        {{ pasar.nama }}
+                                    </h3>
+                                    <p class="text-[11px] sm:text-xs text-zinc-400 leading-relaxed line-clamp-2 font-normal">
+                                        {% if pasar.deskripsi_singkat %}
+                                            {{ pasar.deskripsi_singkat }}
+                                        {% else %}
+                                            {{ pasar.alamat }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="pt-2 sm:pt-3 flex justify-between items-center border-t-2 border-zinc-800 mt-auto">
+                                    {% if pasar.jam_operasional %}
+                                        <span class="inline-block text-[9px] sm:text-[10px] font-bold text-white bg-gradient-to-r from-red-900 to-rose-900 border border-red-500/60 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-none uppercase tracking-wider shadow-[0_0_12px_rgba(185,28,28,0.6)] truncate max-w-[150px]">
+                                            {{ pasar.jam_operasional }}
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-block text-[9px] sm:text-[10px] font-bold text-white bg-gradient-to-r from-red-900 to-rose-900 border border-red-500/60 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-none uppercase tracking-wider shadow-[0_0_12px_rgba(185,28,28,0.6)]">
+                                            AKTIF 24 JAM
+                                        </span>
+                                    {% endif %}
+
+                                    <span class="text-xs sm:text-sm font-bold text-zinc-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all">
+                                        &rarr;
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </a>
+                {% empty %}
+                    <div class="col-span-full text-center py-10 sm:py-12 bg-zinc-900/40 rounded-none border-2 border-zinc-800">
+                        <p class="text-zinc-400 text-xs sm:text-sm">Data unit pasar belum ditambahkan di sistem.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: GALERI KEGIATAN                -->
+    <!-- ========================================== -->
+    {% if galeri_preview %}
+    <section class="relative bg-gradient-to-b from-[#121212] via-[#2a0c0c] to-[#180a0a] py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+                <h2 class="text-lg sm:text-2xl font-bold tracking-widest text-white uppercase mb-2">
+                    GALERI KEGIATAN
+                </h2>
+                <p class="text-gray-400 text-xs sm:text-sm font-normal">Dokumentasi upaya peningkatan fasilitas dan pelayanan di setiap unit pasar.</p>
+            </div>
+
+            <!-- Grid Galeri dengan Ukuran Kartu Seragam (Tinggi 240px) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-10">
+                {% for item in galeri_preview %}
+                <div onclick="openGalleryModal({{ forloop.counter0 }})" 
+                     class="group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800/80 h-[220px] sm:h-[240px] shadow-xl cursor-pointer">
+                    <img src="{{ item.foto.url }}" alt="{{ item.judul }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-3.5 sm:p-4 flex flex-col justify-end group-hover:from-black/95 transition-all">
+                        <span class="text-[9px] sm:text-[10px] text-red-400 font-semibold uppercase tracking-wider mb-0.5">
+                            {{ item.get_kategori_display }}
+                        </span>
+                        <h4 class="text-xs sm:text-sm font-semibold text-white truncate">{{ item.judul }}</h4>
+                        <p class="text-[9px] sm:text-[10px] text-gray-400 font-normal">{{ item.tanggal|date:"d M Y" }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center">
+                <a href="{% url 'core:gallery' %}" class="inline-flex items-center gap-2 bg-red-800/90 hover:bg-red-700 text-white font-semibold px-5 py-2 sm:px-6 sm:py-2.5 rounded-lg text-xs tracking-wider uppercase transition shadow-lg shadow-red-950/50 border border-red-700/50">
+                    LIHAT GALERI LENGKAP
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- LIGHTBOX / POPUP MODAL GALERI             -->
+    <!-- ========================================== -->
+    <div id="galleryModal" onclick="closeModalOnBackdrop(event)" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 transition-opacity duration-300">
+        
+        <!-- Tombol Close -->
+        <button onclick="closeGalleryModal()" aria-label="Tutup Galeri" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white bg-zinc-800/80 hover:bg-red-700 p-2 sm:p-3 rounded-full transition z-30">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- Tombol Navigasi Kiri (Prev) -->
+        <button onclick="prevGalleryImage()" aria-label="Gambar Sebelumnya" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-red-700 text-white p-2.5 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+
+        <!-- Container Konten Gambar & Text -->
+        <div class="max-w-4xl w-full max-h-[85vh] flex flex-col items-center justify-center relative z-20">
+            <div class="relative w-full max-h-[65vh] sm:max-h-[72vh] flex justify-center items-center overflow-hidden rounded-lg bg-zinc-950">
+                <img id="modalImg" src="" alt="" class="max-w-full max-h-[65vh] sm:max-h-[72vh] object-contain select-none transition-all duration-300">
+            </div>
+
+            <!-- Detail Teks Gambar -->
+            <div class="w-full text-center mt-3 sm:mt-4 space-y-1">
+                <span id="modalKategori" class="inline-block text-[10px] sm:text-xs text-rose-400 font-semibold uppercase tracking-wider"></span>
+                <h3 id="modalJudul" class="text-sm sm:text-lg font-bold text-white px-4"></h3>
+                <p id="modalTanggal" class="text-[10px] sm:text-xs text-zinc-400 font-normal"></p>
+            </div>
+        </div>
+
+        <!-- Tombol Navigasi Kanan (Next) -->
+        <button onclick="nextGalleryImage()" aria-label="Gambar Selanjutnya" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-red-700 text-white p-2.5 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
     </div>
+    {% endif %}
+
 </div>
-{% endblock content %}
+
+<!-- JavaScript Autoplay, Carousel & Gallery Modal Lightbox -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- CAROUSEL MAIN HERO ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        const totalSlides = slides.length;
+        const inner = document.querySelector('.carousel-inner');
+        const indicatorsContainer = document.getElementById('carouselIndicators');
+        let autoplayTimer = null;
+
+        // Inisialisasi Indicator Bullets Secara Dinamis
+        if (indicatorsContainer && totalSlides > 0) {
+            indicatorsContainer.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const btn = document.createElement('button');
+                btn.className = `indicator w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-red-600 w-6' : 'bg-gray-500/60'}`;
+                btn.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                btn.addEventListener('click', () => goToSlideManual(i));
+                indicatorsContainer.appendChild(btn);
+            }
+        }
+
+        const indicators = document.querySelectorAll('.indicator');
+
+        function updateCarousel() {
+            if (!inner) return;
+            inner.style.transform = `translateX(-${currentSlide * 100}%)`;
+            indicators.forEach((ind, index) => {
+                if (index === currentSlide) {
+                    ind.classList.remove('bg-gray-500/60', 'w-2.5');
+                    ind.classList.add('bg-red-600', 'w-6');
+                } else {
+                    ind.classList.remove('bg-red-600', 'w-6');
+                    ind.classList.add('bg-gray-500/60', 'w-2.5');
+                }
+            });
+        }
+
+        function nextSlide() {
+            if (totalSlides === 0) return;
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            if (totalSlides === 0) return;
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+
+        function startAutoplay() {
+            stopAutoplay();
+            if (totalSlides > 1) {
+                autoplayTimer = setInterval(nextSlide, 5000);
+            }
+        }
+
+        function stopAutoplay() {
+            if (autoplayTimer) {
+                clearInterval(autoplayTimer);
+            }
+        }
+
+        function goToSlideManual(index) {
+            currentSlide = index;
+            updateCarousel();
+            startAutoplay();
+        }
+
+        document.getElementById('nextBtn')?.addEventListener('click', () => {
+            nextSlide();
+            startAutoplay();
+        });
+
+        document.getElementById('prevBtn')?.addEventListener('click', () => {
+            prevSlide();
+            startAutoplay();
+        });
+
+        startAutoplay();
+    });
+
+    // --- GALLERY POPUP MODAL LIGHTBOX ---
+    const galleryItems = [
+        {% if galeri_preview %}
+            {% for item in galeri_preview %}
+            {
+                url: "{{ item.foto.url }}",
+                judul: "{{ item.judul|escapejs }}",
+                kategori: "{{ item.get_kategori_display|escapejs }}",
+                tanggal: "{{ item.tanggal|date:'d M Y' }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        {% endif %}
+    ];
+
+    let currentGalleryIndex = 0;
+
+    function updateGalleryModal() {
+        if (!galleryItems.length) return;
+        const item = galleryItems[currentGalleryIndex];
+        const modalImg = document.getElementById('modalImg');
+        
+        modalImg.style.opacity = '0';
+        setTimeout(() => {
+            modalImg.src = item.url;
+            modalImg.alt = item.judul;
+            document.getElementById('modalKategori').innerText = item.kategori;
+            document.getElementById('modalJudul').innerText = item.judul;
+            document.getElementById('modalTanggal').innerText = item.tanggal;
+            modalImg.style.opacity = '1';
+        }, 150);
+    }
+
+    function openGalleryModal(index) {
+        currentGalleryIndex = index;
+        updateGalleryModal();
+        const modal = document.getElementById('galleryModal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeGalleryModal() {
+        const modal = document.getElementById('galleryModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function prevGalleryImage() {
+        if (!galleryItems.length) return;
+        currentGalleryIndex = (currentGalleryIndex - 1 + galleryItems.length) % galleryItems.length;
+        updateGalleryModal();
+    }
+
+    function nextGalleryImage() {
+        if (!galleryItems.length) return;
+        currentGalleryIndex = (currentGalleryIndex + 1) % galleryItems.length;
+        updateGalleryModal();
+    }
+
+    function closeModalOnBackdrop(event) {
+        if (event.target.id === 'galleryModal') {
+            closeGalleryModal();
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('galleryModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            if (e.key === 'Escape') closeGalleryModal();
+            if (e.key === 'ArrowLeft') prevGalleryImage();
+            if (e.key === 'ArrowRight') nextGalleryImage();
+        }
+    });
+</script>
+{% endblock %}

@@ -88,3 +88,25 @@ class Galeri(models.Model):
 
     def __str__(self):
         return f"{self.judul} - {self.get_kategori_display()}"
+    
+class HeroBannerUtama(models.Model):
+    gambar = models.ImageField(
+        upload_to='hero_banners/', 
+        blank=True, 
+        null=True, 
+        help_text="Gambar Banner Utama (Slide 1 Beranda)"
+    )
+
+    class Meta:
+        verbose_name = "Hero Banner Utama"
+        verbose_name_plural = "Hero Banner Utama"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    def __str__(self):
+        return "Hero Banner Utama"
