@@ -1,0 +1,24 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Galeri</h1>
+    <a href="{% url 'dashboard:gallery_create' %}" class="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900">+ Tambah Foto</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% for g in galeri_list %}
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <img src="{{ g.foto.url }}" class="w-full h-32 object-cover">
+        <div class="p-3">
+            <p class="text-sm font-semibold truncate">{{ g.judul }}</p>
+            <p class="text-xs text-gray-500">{{ g.get_kategori_display }} · {{ g.tanggal }}</p>
+            <form method="post" action="{% url 'dashboard:galeri_delete' g.pk %}" onsubmit="return confirm('Hapus foto ini?')" class="mt-2">
+                {% csrf_token %}
+                <button type="submit" class="text-red-600 text-xs hover:underline">Hapus</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-gray-500 col-span-4">Belum ada foto di galeri.</p>
+    {% endfor %}
+</div>
+{% endblock %}

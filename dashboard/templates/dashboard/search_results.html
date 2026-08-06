@@ -1,0 +1,80 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block content %}
+<style>
+    .adm-card{ background:var(--adm-surface); border:1px solid var(--adm-border); border-radius:14px; }
+    .adm-search-item{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; }
+    .adm-search-item:not(:last-child){ border-bottom:1px solid var(--adm-border); }
+    .adm-search-item a{ color:var(--adm-text); text-decoration:none; font-size:.88rem; font-weight:500; }
+    .adm-search-item a:hover{ color:#f3a5a5; }
+    .adm-search-item p{ margin:2px 0 0; font-size:.75rem; color:var(--adm-text-dim); }
+</style>
+
+<h1 style="font-size:1.4rem; font-weight:700; margin-bottom:4px;">Hasil pencarian</h1>
+<p style="font-size:.85rem; color:var(--adm-text-dim); margin-bottom:20px;">
+    {% if q %}
+        Menampilkan {{ total_hasil }} hasil untuk "<strong style="color:var(--adm-text);">{{ q }}</strong>"
+    {% else %}
+        Ketik sesuatu di kotak pencarian untuk mulai mencari.
+    {% endif %}
+</p>
+
+{% if q %}
+<div class="space-y-5">
+    {% if hasil.pasar %}
+    <div class="adm-card">
+        <div style="padding:16px 18px 8px; font-weight:700; font-size:.9rem;">Unit Pasar</div>
+        {% for p in hasil.pasar %}
+        <div class="adm-search-item">
+            <a href="{% url 'dashboard:unit_pasar_update' p.pk %}">{{ p.nama }}</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if hasil.anggota %}
+    <div class="adm-card">
+        <div style="padding:16px 18px 8px; font-weight:700; font-size:.9rem;">Anggota</div>
+        {% for a in hasil.anggota %}
+        <div class="adm-search-item">
+            <div>
+                <a href="{% url 'dashboard:anggota_update' a.pk %}">{{ a.nama }}</a>
+                <p>{{ a.jabatan }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if hasil.pengaduan %}
+    <div class="adm-card">
+        <div style="padding:16px 18px 8px; font-weight:700; font-size:.9rem;">Pengaduan</div>
+        {% for p in hasil.pengaduan %}
+        <div class="adm-search-item">
+            <div>
+                <a href="{% url 'dashboard:pengaduan_list' %}">{{ p.nama }}</a>
+                <p>{{ p.pesan|truncatewords:12 }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if hasil.galeri %}
+    <div class="adm-card">
+        <div style="padding:16px 18px 8px; font-weight:700; font-size:.9rem;">Galeri</div>
+        {% for g in hasil.galeri %}
+        <div class="adm-search-item">
+            <a href="{% url 'dashboard:galeri_list' %}">{{ g.judul }}</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if total_hasil == 0 %}
+    <div class="adm-card" style="padding:30px; text-align:center; color:var(--adm-text-dim); font-size:.88rem;">
+        Tidak ada data yang cocok dengan "{{ q }}".
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

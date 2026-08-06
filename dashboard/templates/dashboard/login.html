@@ -1,0 +1,15 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block content_no_auth %}
+<div class="min-h-screen flex items-center justify-center">
+    <form method="post" class="bg-white p-8 rounded-lg shadow w-full max-w-sm">
+        {% csrf_token %}
+        <h1 class="text-xl font-bold mb-6">Login Dashboard UPTD</h1>
+        {% if form.errors %}
+            <p class="text-red-600 text-sm mb-4">Username atau password salah.</p>
+        {% endif %}
+        <input type="text" name="username" placeholder="Username" class="w-full border rounded px-3 py-2 mb-3" required>
+        <input type="password" name="password" placeholder="Password" class="w-full border rounded px-3 py-2 mb-4" required>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Masuk</button>
+    </form>
+</div>
+{% endblock %}

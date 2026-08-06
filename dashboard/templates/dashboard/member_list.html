@@ -1,0 +1,31 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Anggota</h1>
+    <a href="{% url 'dashboard:anggota_create' %}" class="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900">+ Tambah Anggota</a>
+</div>
+<table class="w-full bg-white rounded-lg shadow overflow-hidden">
+    <thead class="bg-gray-900 text-white text-left text-sm">
+        <tr><th class="p-3">Nama</th><th class="p-3">Jabatan</th><th class="p-3">Kategori</th><th class="p-3">Unit Pasar</th><th class="p-3">Aksi</th></tr>
+    </thead>
+    <tbody>
+        {% for a in anggota_list %}
+        <tr class="border-t text-sm">
+            <td class="p-3">{{ a.nama }}</td>
+            <td class="p-3">{{ a.jabatan }}</td>
+            <td class="p-3">{{ a.get_kategori_display }}</td>
+            <td class="p-3">{{ a.pasar.nama|default:"-" }}</td>
+            <td class="p-3 space-x-2">
+                <a href="{% url 'dashboard:anggota_update' a.pk %}" class="text-blue-700 hover:underline">Edit</a>
+                <form method="post" action="{% url 'dashboard:anggota_delete' a.pk %}" class="inline" onsubmit="return confirm('Hapus {{ a.nama }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada data anggota.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

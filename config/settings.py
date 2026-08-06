@@ -35,8 +35,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "complaint",
     "core",
+    "dashboard",
     "market",
     "membership",
+    "axes",
 ]
 
 MIDDLEWARE = [
@@ -47,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -62,6 +65,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 'complaint.context_processors.pengaduan_form',
+                'dashboard.context_processors.pengaduan_pending_count',
             ],
         },
     },
@@ -100,6 +104,24 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+LOGIN_URL = 'dashboard:login'
+LOGIN_REDIRECT_URL = 'dashboard:home_dashboard'
+LOGOUT_REDIRECT_URL = 'dashboard:login'
+
+# Authentication backends (django-axes wajib didaftarkan)
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# django-axes: lockout brute-force login
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1          # jam, otomatis kebuka lagi
+AXES_LOCKOUT_PARAMETERS = ["username"]
+
+# Custom admin path (jangan hardcode, ambil dari .env)
+ADMIN_PATH = os.getenv("ADMIN_PATH", "admin/")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

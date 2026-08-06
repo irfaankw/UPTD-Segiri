@@ -46,7 +46,21 @@
                         {% else %}
                         <div class="w-full h-full bg-surface-container-high"></div>
                         {% endif %}
-                        <span class="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition"></span>
+
+                        <!-- Gradient scrim biar teks kebaca di atas foto apapun -->
+                        <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/40 group-hover:from-black/85 transition"></span>
+
+                        <!-- Badge + judul, overlay di pojok kiri bawah -->
+                        <span class="absolute left-5 bottom-5 right-5 text-left">
+                            {% if pasar.kelas %}
+                            <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1 mb-2">
+                                Pasar {{ pasar.get_kelas_display }}
+                            </span>
+                            {% endif %}
+                            <span class="block text-2xl md:text-3xl font-bold text-white drop-shadow-md">{{ pasar.nama }}</span>
+                        </span>
+
+                        <!-- Tombol play, tetap di tengah -->
                         <span class="absolute inset-0 flex items-center justify-center">
                             <span class="w-16 h-16 rounded-full bg-primary-container/90 flex items-center justify-center group-hover:scale-110 transition shadow-lg">
                                 <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
@@ -54,12 +68,20 @@
                                 </svg>
                             </span>
                         </span>
-                        <span class="absolute bottom-3 right-3 text-xs font-semibold text-white bg-black/60 rounded-full px-3 py-1">
-                            Putar Video Profil
-                        </span>
                     </button>
                     {% elif pasar.foto %}
-                    <img src="{{ pasar.foto.url }}" alt="{{ pasar.nama }}" class="w-full h-full object-cover">
+                    <div class="relative w-full h-full">
+                        <img src="{{ pasar.foto.url }}" alt="{{ pasar.nama }}" class="w-full h-full object-cover">
+                        <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/40"></span>
+                        <span class="absolute left-5 bottom-5 right-5 text-left">
+                            {% if pasar.kelas %}
+                            <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1 mb-2">
+                                Pasar {{ pasar.get_kelas_display }}
+                            </span>
+                            {% endif %}
+                            <span class="block text-2xl md:text-3xl font-bold text-white drop-shadow-md">{{ pasar.nama }}</span>
+                        </span>
+                    </div>
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center text-outline">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,6 +90,8 @@
                     </div>
                     {% endif %}
                 </div>
+
+                {% if not pasar.video_profil and not pasar.foto %}
                 <div class="p-6">
                     {% if pasar.kelas %}
                     <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1 mb-3">
@@ -75,10 +99,8 @@
                     </span>
                     {% endif %}
                     <h1 class="text-2xl md:text-3xl font-bold text-on-surface">{{ pasar.nama }}</h1>
-                    {% if pasar.deskripsi %}
-                    <p class="mt-2 text-on-surface-variant leading-relaxed">{{ pasar.deskripsi|truncatewords:25 }}</p>
-                    {% endif %}
                 </div>
+                {% endif %}
             </div>
 
             <!-- ARTIKEL: INFORMASI UNIT PASAR -->
@@ -181,6 +203,25 @@
                 {% endif %}
             </div>
 
+            <!-- CTA: SAMPAIKAN MASUKAN -->
+            <div class="reveal rounded-xl border border-outline-variant bg-surface-container p-6 text-center">
+                <div class="w-12 h-12 mx-auto rounded-full bg-primary-container/20 flex items-center justify-center mb-3 text-primary">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h3 class="font-bold text-on-surface mb-1">Ada Masukan untuk {{ pasar.nama }}?</h3>
+                <p class="text-sm text-on-surface-variant mb-4">
+                    Sampaikan keluhan, saran, atau laporan terkait kondisi pasar ini kepada pengelola UPTD.
+                </p>
+                <button type="button" class="feedback-trigger inline-flex items-center gap-2 text-sm font-semibold text-white bg-primary-container rounded-lg px-5 py-2.5 hover:opacity-90 transition">
+                    Sampaikan Masukan
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </button>
+            </div>
+
         </div>
         <!-- ================= END MAIN ================= -->
 
@@ -210,10 +251,16 @@
                 </div>
 
                 {% if pasar.foto_aktivitas.all %}
-                <div class="aspect-[4/3] bg-surface-container-high">
+                <button type="button" onclick="openModal('modal-galeri')"
+                        class="group relative block w-full aspect-[4/3] bg-surface-container-high cursor-zoom-in">
                     <img id="galeri-image" src="{{ pasar.foto_aktivitas.all.0.gambar.url }}"
                          alt="Aktivitas {{ pasar.nama }}" class="w-full h-full object-cover">
-                </div>
+                    <span class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM11 8v6m-3-3h6" />
+                        </svg>
+                    </span>
+                </button>
                 <div class="flex items-center justify-between px-5 py-3">
                     <p id="galeri-caption" class="text-xs text-on-surface-variant truncate pr-2">
                         {{ pasar.foto_aktivitas.all.0.keterangan }}
@@ -345,6 +392,76 @@
     </div>
 </div>
 
+<!-- MODAL: GALERI AKTIVITAS PASAR -->
+{% if pasar.foto_aktivitas.all %}
+<div id="modal-galeri" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeModal('modal-galeri')"></div>
+
+    <!-- Tombol navigasi DI LUAR kotak modal, mengambang di atas backdrop -->
+    {% comment %} <button type="button" onclick="galeriPrev()"
+            class="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+    </button>
+    <button type="button" onclick="galeriNext()"
+            class="hidden md:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+    </button> {% endcomment %}
+
+    <div class="relative bg-surface-container-lowest border border-outline-variant rounded-xl w-full max-w-4xl h-[85vh] md:h-[560px] overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Sisi gambar: ukuran FIXED, foto apapun dibingkai sama -->
+        <div class="relative w-full md:w-3/5 h-1/2 md:h-full bg-black flex items-center justify-center shrink-0">
+            <img id="galeri-modal-image" src="{{ pasar.foto_aktivitas.all.0.gambar.url }}"
+                 alt="Aktivitas {{ pasar.nama }}" class="w-full h-full object-contain">
+            <!-- Tombol navigasi versi mobile, tetap di dalam gambar karena ruang layar sempit -->
+            <button type="button" onclick="galeriPrev()"
+                    class="md:hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <button type="button" onclick="galeriNext()"
+                    class="md:hidden absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Sisi info -->
+        <div class="w-full md:w-2/5 h-1/2 md:h-full flex flex-col p-6 custom-scroll overflow-y-auto">
+            <div class="flex items-center justify-between mb-5">
+                <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1">
+                    Aktivitas Pasar
+                </span>
+                <button type="button" onclick="closeModal('modal-galeri')" class="text-outline hover:text-on-surface transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <h3 id="galeri-modal-caption" class="text-xl font-bold text-on-surface leading-snug">
+                {{ pasar.foto_aktivitas.all.0.keterangan }}
+            </h3>
+
+            <div class="mt-auto pt-6 border-t border-outline-variant flex items-center justify-between">
+                <p class="flex items-center gap-2 text-sm text-on-surface-variant">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    {{ pasar.nama }}
+                </p>
+                <span id="galeri-modal-counter" class="text-xs text-outline shrink-0">1 / {{ pasar.foto_aktivitas.all|length }}</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+
 <!-- MODAL: DOKUMEN RESMI -->
 <div id="modal-dokumen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-dokumen')"></div>
@@ -369,11 +486,11 @@
                     <span class="text-sm text-on-surface truncate">{{ dokumen.judul }}</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <a href="{{ dokumen.file.url }}" target="_blank" rel="noopener"
+                    <a href="{% url 'market:dokumen_lihat' dokumen.pk %}" target="_blank" rel="noopener"
                        class="text-xs font-semibold text-primary border border-primary rounded-md px-3 py-1.5 hover:bg-primary hover:text-white transition">
                         Lihat
                     </a>
-                    <a href="{{ dokumen.file.url }}" download
+                    <a href="{% url 'market:dokumen_unduh' dokumen.pk %}"
                        class="text-xs font-semibold text-on-surface-variant border border-outline-variant rounded-md px-3 py-1.5 hover:border-primary hover:text-primary transition">
                         Unduh
                     </a>
@@ -425,23 +542,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     {% endif %}
 
-    // --- Carousel galeri "Aktivitas Pasar" ---
+    // --- Carousel galeri "Aktivitas Pasar" (sidebar + modal, index sinkron) ---
     const galeriData = [
         {% for foto in pasar.foto_aktivitas.all %}
         { url: "{{ foto.gambar.url|escapejs }}", caption: "{{ foto.keterangan|escapejs }}" }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
     let galeriIndex = 0;
+
+    // Preload semua gambar galeri di background begitu halaman dibuka,
+    // biar pas prev/next diklik, gambar udah ada di cache browser (nggak lag)
+    galeriData.forEach(item => {
+        const preloadImg = new Image();
+        preloadImg.src = item.url;
+    });
+
     const galeriImg = document.getElementById('galeri-image');
     const galeriCaption = document.getElementById('galeri-caption');
     const galeriCounter = document.getElementById('galeri-counter');
+    const galeriModalImg = document.getElementById('galeri-modal-image');
+    const galeriModalCaption = document.getElementById('galeri-modal-caption');
+    const galeriModalCounter = document.getElementById('galeri-modal-counter');
 
     function renderGaleri() {
-        if (!galeriImg || galeriData.length === 0) return;
+        if (galeriData.length === 0) return;
         const item = galeriData[galeriIndex];
-        galeriImg.src = item.url;
-        galeriCaption.textContent = item.caption;
-        galeriCounter.textContent = `${galeriIndex + 1} / ${galeriData.length}`;
+        const counterText = `${galeriIndex + 1} / ${galeriData.length}`;
+
+        if (galeriImg) galeriImg.src = item.url;
+        if (galeriCaption) galeriCaption.textContent = item.caption;
+        if (galeriCounter) galeriCounter.textContent = counterText;
+
+        if (galeriModalImg) galeriModalImg.src = item.url;
+        if (galeriModalCaption) galeriModalCaption.textContent = item.caption;
+        if (galeriModalCounter) galeriModalCounter.textContent = counterText;
     }
 
     window.galeriPrev = function () {
@@ -455,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGaleri();
     };
 
-    // --- Modal generik (dokumen resmi & struktur organisasi) ---
+    // --- Modal generik (galeri, dokumen resmi, struktur organisasi) ---
     window.openModal = function (id) {
         const modal = document.getElementById(id);
         if (!modal) return;
@@ -472,6 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') {
             document.querySelectorAll('[id^="modal-"]:not(.hidden)').forEach(m => closeModal(m.id));
         }
+        if (e.key === 'ArrowLeft') window.galeriPrev();
+        if (e.key === 'ArrowRight') window.galeriNext();
     });
 });
 </script>

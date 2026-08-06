@@ -1,5 +1,6 @@
+from django.http import FileResponse, Http404
 from django.shortcuts import render, get_object_or_404
-from .models import Pasar
+from .models import Pasar, DokumenResmi
 
 def market_unit(request):
     daftar_pasar = Pasar.objects.all()
@@ -28,3 +29,22 @@ def market_detail(request, slug):
         "kepala_unit": pasar.anggota.first(),
     }
     return render(request, "market/market_detail.html", context)
+
+def dokumen_lihat(request, pk):
+    dokumen = get_object_or_404(DokumenResmi, pk=pk)
+    try:
+        return FileResponse(dokumen.file.open("rb"), content_type="application/pdf")
+    except FileNotFoundError:
+        raise Http404("Dokumen tidak ditemukan.")
+
+
+def dokumen_unduh(request, pk):
+    dokumen = get_object_or_404(DokumenResmi, pk=pk)
+    try:
+        return FileResponse(
+            dokumen.file.open("rb"),
+            as_attachment=True,
+            filename=f"{dokumen.judul}.pdf",
+        )
+    except FileNotFoundError:
+        raise Http404("Dokumen tidak ditemukan.")
