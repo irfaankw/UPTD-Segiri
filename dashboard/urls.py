@@ -35,6 +35,7 @@ urlpatterns = [
     path('galeri/', views.gallery_list, name='gallery_list'),
     path('galeri/tambah/', views.gallery_create, name='gallery_create'),
     path('galeri/<int:pk>/hapus/', views.gallery_delete, name='gallery_delete'),
+    path("galeri/<int:pk>/edit/", views.gallery_edit, name="gallery_edit"),
 
     # Profil UPTD
     path('profil-uptd/', views.profil_uptd, name='profil_uptd'),

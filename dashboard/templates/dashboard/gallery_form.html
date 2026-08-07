@@ -1,18 +1,204 @@
-{% extends "dashboard/base_dashboard.html" %}
+{% extends 'dashboard/base_dashboard.html' %}
+
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Tambah Foto Galeri</h1>
-<form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow space-y-4 max-w-xl">
-    {% csrf_token %}
-    {% for field in form %}
-    <div>
-        <label class="block text-sm font-medium mb-1">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}<p class="text-red-600 text-xs mt-1">{{ field.errors|join:", " }}</p>{% endif %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <!-- Breadcrumb & Header -->
+    <div class="space-y-2">
+        <nav class="flex text-xs text-gray-400 gap-2">
+            <a href="{% url 'dashboard:gallery_list' %}" class="hover:text-white transition">Galeri</a>
+            <span>&rsaquo;</span>
+            <span class="text-gray-200 font-medium">
+                {% if form.instance.pk %}Edit Foto{% else %}Tambah Foto{% endif %}
+            </span>
+        </nav>
+        
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-white tracking-wide">
+                    {% if form.instance.pk %}Edit Foto Galeri{% else %}Unggah Foto Galeri{% endif %}
+                </h1>
+                <p class="text-sm text-gray-400 mt-0.5">
+                    {% if form.instance.pk %}Perbarui informasi dokumentasi foto galeri UPTD.{% else %}Lengkapi informasi untuk menambahkan dokumentasi baru ke galeri UPTD.{% endif %}
+                </p>
+            </div>
+            <a href="{% url 'dashboard:gallery_list' %}" class="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-xs font-medium rounded-lg transition border border-zinc-700 flex items-center gap-1.5">
+                &larr; Kembali
+            </a>
+        </div>
     </div>
-    {% endfor %}
-    <div class="flex gap-3 pt-2">
-        <button type="submit" class="bg-red-800 text-white px-5 py-2 rounded hover:bg-red-900">Simpan</button>
-        <a href="{% url 'dashboard:gallery_list' %}" class="px-5 py-2 rounded border">Batal</a>
+
+    <!-- Alert Error Jika Validasi Gagal -->
+    {% if form.errors %}
+    <div class="p-4 bg-red-950/60 border border-red-800/80 rounded-xl text-red-200 text-xs space-y-1">
+        <p class="font-semibold text-red-400">Gagal menyimpan data. Harap periksa kolom berikut:</p>
+        <ul class="list-disc pl-4 space-y-0.5">
+            {% for field, errors in form.errors.items %}
+                <li><strong class="capitalize">{{ field }}</strong>: {{ errors.0 }}</li>
+            {% endfor %}
+        </ul>
     </div>
-</form>
+    {% endif %}
+
+    <!-- Form Utama -->
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {% csrf_token %}
+
+        <!-- KOLOM KIRI: Unggah File & Keterangan -->
+        <div class="lg:col-span-7 space-y-6">
+            <div class="bg-[#18181b] p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-950/50 border border-red-800/40 flex items-center justify-center text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h2 class="font-semibold text-white text-sm">Berkas Gambar</h2>
+                </div>
+
+                <!-- Preview Gambar Lama jika sedang Edit -->
+                {% if form.instance.foto %}
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-medium text-gray-400">Foto Saat Ini:</label>
+                    <div class="w-full h-40 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-900">
+                        <img src="{{ form.instance.foto.url }}" alt="{{ form.instance.judul }}" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Input Foto -->
+                {% if form.foto %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1.5">
+                        {{ form.foto.label }} {% if not form.instance.pk %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    
+                    <!-- Container Upload (Klik untuk Memicu File Dialog) -->
+                    <div onclick="document.getElementById('{{ form.foto.id_for_label }}').click()" 
+                         class="w-full h-44 bg-[#27272a] border-2 border-dashed border-zinc-700 hover:border-red-600/60 rounded-xl flex flex-col items-center justify-center p-4 text-center transition cursor-pointer relative group">
+                        
+                        <div class="w-10 h-10 rounded-lg bg-red-600/90 text-white flex items-center justify-center mb-2 shadow-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        </div>
+
+                        <span id="file-label-text" class="text-xs font-medium text-white">
+                            {% if form.instance.pk %}Klik untuk Mengganti Foto (Opsional){% else %}Pilih File Berkas Foto{% endif %}
+                        </span>
+                        <span class="text-[10px] text-gray-400 mt-1">Format dukungan: JPG, PNG, WEBP (Max: 5MB)</span>
+
+                        <!-- Input File Asli (Disembunyikan) -->
+                        <div class="hidden">
+                            {{ form.foto }}
+                        </div>
+                    </div>
+
+                    {% if form.foto.errors %}<p class="text-red-400 text-xs mt-1.5">{{ form.foto.errors.0 }}</p>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Keterangan Foto -->
+                {% if form.keterangan %}
+                <div>
+                    <label for="{{ form.keterangan.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1.5">
+                        {{ form.keterangan.label }}
+                    </label>
+                    <div class="[&_textarea]:w-full [&_textarea]:bg-[#27272a] [&_textarea]:border [&_textarea]:border-zinc-700/80 [&_textarea]:rounded-xl [&_textarea]:p-3 [&_textarea]:text-xs [&_textarea]:text-white [&_textarea]:focus:outline-none [&_textarea]:focus:border-red-600 [&_textarea]:rows-3">
+                        {{ form.keterangan }}
+                    </div>
+                    {% if form.keterangan.errors %}<p class="text-red-400 text-xs mt-1.5">{{ form.keterangan.errors.0 }}</p>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN: Detail Informasi -->
+        <div class="lg:col-span-5 space-y-6">
+            <div class="bg-[#18181b] p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-950/50 border border-red-800/40 flex items-center justify-center text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="font-semibold text-white text-sm">Informasi Foto</h2>
+                </div>
+
+                <!-- Judul Foto -->
+                {% if form.judul %}
+                <div>
+                    <label for="{{ form.judul.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1.5">
+                        {{ form.judul.label }} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3.5 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                        {{ form.judul }}
+                    </div>
+                    {% if form.judul.errors %}<p class="text-red-400 text-xs mt-1.5">{{ form.judul.errors.0 }}</p>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Kategori -->
+                {% if form.kategori %}
+                <div>
+                    <label for="{{ form.kategori.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1.5">
+                        {{ form.kategori.label }} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="[&_select]:w-full [&_select]:bg-[#27272a] [&_select]:border [&_select]:border-zinc-700/80 [&_select]:rounded-xl [&_select]:px-3.5 [&_select]:py-2 [&_select]:text-xs [&_select]:text-white [&_select]:focus:outline-none [&_select]:focus:border-red-600 [&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3.5 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white">
+                        {{ form.kategori }}
+                    </div>
+                    {% if form.kategori.errors %}<p class="text-red-400 text-xs mt-1.5">{{ form.kategori.errors.0 }}</p>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Tanggal -->
+                {% if form.tanggal %}
+                <div>
+                    <label for="{{ form.tanggal.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1.5">
+                        {{ form.tanggal.label }} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3.5 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                        {{ form.tanggal }}
+                    </div>
+                    {% if form.tanggal.errors %}<p class="text-red-400 text-xs mt-1.5">{{ form.tanggal.errors.0 }}</p>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Field Dinamis Tambahan -->
+                {% for field in form %}
+                    {% if field.name not in "judul,kategori,keterangan,tanggal,foto" %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1.5">
+                            {{ field.label }}
+                        </label>
+                        <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3.5 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_select]:w-full [&_select]:bg-[#27272a] [&_select]:border [&_select]:border-zinc-700/80 [&_select]:rounded-xl [&_select]:px-3.5 [&_select]:py-2 [&_select]:text-xs [&_select]:text-white">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Tombol Simpan / Batal -->
+            <div class="flex gap-3 pt-2">
+                <a href="{% url 'dashboard:gallery_list' %}" class="w-1/3 py-3 bg-[#18181b] hover:bg-zinc-800 text-gray-300 font-medium text-xs text-center rounded-xl transition border border-zinc-800 flex items-center justify-center">
+                    BATAL
+                </a>
+                <button type="submit" class="w-2/3 py-3 bg-red-700 hover:bg-red-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-red-900/30 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    {% if form.instance.pk %}SIMPAN PERUBAHAN{% else %}SIMPAN FOTO{% endif %}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Script pembaruan nama file setelah dipilih -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileInput = document.getElementById('{{ form.foto.id_for_label }}');
+        const fileLabel = document.getElementById('file-label-text');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    fileLabel.innerText = "Terpilih: " + e.target.files[0].name;
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
