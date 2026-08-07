@@ -1,0 +1,77 @@
+/* ===== GRID KARTU UNIT PASAR (market_list.html) ===== */
+.adm-mkt-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:18px; }
+.adm-mkt-card{ overflow:hidden; display:flex; flex-direction:column; }
+
+.adm-mkt-thumb{ position:relative; aspect-ratio:16/10; background:var(--adm-surface-2); overflow:hidden; }
+.adm-mkt-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+.adm-mkt-thumb-empty{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--adm-text-faint); }
+.adm-mkt-badge{ position:absolute; top:10px; left:10px; background:rgba(0,0,0,.55); backdrop-filter:blur(3px); color:#fff; font-size:.68rem; font-weight:700; padding:4px 10px; border-radius:999px; }
+.adm-mkt-video-flag{ position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:999px; background:var(--adm-red-bright); color:#fff; display:flex; align-items:center; justify-content:center; }
+
+.adm-mkt-body{ padding:16px 18px 6px; flex:1; }
+.adm-mkt-name{ font-size:1.02rem; font-weight:700; margin:0 0 4px; }
+.adm-mkt-address{ font-size:.78rem; color:var(--adm-text-dim); margin:0 0 12px; line-height:1.4; }
+.adm-mkt-meta{ display:flex; flex-wrap:wrap; gap:10px 14px; font-size:.72rem; color:var(--adm-text-dim); margin-bottom:6px; }
+
+.adm-mkt-actions{ display:flex; gap:8px; padding:14px 18px 18px; border-top:1px solid var(--adm-border); margin-top:10px; }
+.adm-mkt-actions form{ margin:0; }
+.adm-empty-state{ grid-column:1/-1; padding:40px 20px; text-align:center; color:var(--adm-text-dim); font-size:.88rem; }
+
+/* ===== TOMBOL DASAR (dipakai lintas halaman dashboard) ===== */
+.adm-btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:.8rem; font-weight:600; padding:8px 16px; border-radius:9px; border:1px solid transparent; cursor:pointer; text-decoration:none; white-space:nowrap; transition:opacity .15s ease, background .15s ease; }
+.adm-btn-primary{ background:var(--adm-red-bright); color:#fff; }
+.adm-btn-primary:hover{ opacity:.9; }
+.adm-btn-outline{ background:var(--adm-surface-2); border-color:var(--adm-border); color:var(--adm-text); }
+.adm-btn-outline:hover{ border-color:var(--adm-text-dim); }
+.adm-btn-ghost{ background:transparent; border-color:var(--adm-border); color:var(--adm-text-dim); }
+.adm-btn-ghost:hover{ color:var(--adm-text); border-color:var(--adm-text-dim); }
+.adm-btn-danger{ background:rgba(200,30,30,.12); color:#f3a5a5; border-color:rgba(200,30,30,.3); }
+.adm-btn-danger:hover{ background:rgba(200,30,30,.22); }
+
+/* ===== FORM DASAR (market_form.html) ===== */
+.adm-form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px 18px; padding:16px 22px 22px; }
+.adm-form-grid.is-single{ grid-template-columns:1fr; }
+.adm-form-group{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.adm-form-group.span-2{ grid-column:span 2; }
+.adm-form-group label{ font-size:.78rem; font-weight:600; color:var(--adm-text-dim); }
+.adm-form-group .hint{ font-size:.7rem; color:var(--adm-text-faint); margin:0; }
+.adm-form-group .err{ font-size:.72rem; color:#f3a5a5; margin:0; }
+
+.adm-field{ width:100%; background:var(--adm-surface-2); border:1px solid var(--adm-border); border-radius:9px; padding:9px 12px; font-size:.85rem; color:var(--adm-text); font-family:inherit; outline:none; }
+.adm-field:focus{ border-color:var(--adm-red-bright); }
+textarea.adm-field{ resize:vertical; min-height:90px; }
+select.adm-field{ cursor:pointer; }
+
+.adm-file-input{ width:100%; font-size:.78rem; color:var(--adm-text-dim); background:var(--adm-surface-2); border:1px dashed var(--adm-border); border-radius:9px; padding:10px 12px; cursor:pointer; }
+.adm-file-input::file-selector-button{ background:var(--adm-red-bright); color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:.72rem; font-weight:600; margin-right:10px; cursor:pointer; }
+
+.adm-file-preview{ margin-top:8px; display:flex; align-items:center; gap:10px; }
+.adm-file-preview img{ width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--adm-border); }
+.adm-file-preview .name{ font-size:.72rem; color:var(--adm-text-dim); word-break:break-all; }
+.adm-file-preview a{ font-size:.72rem; color:#f3a5a5; }
+
+/* ===== FORMSET (baris berulang) ===== */
+.adm-formset-body{ padding:8px 22px 20px; display:flex; flex-direction:column; gap:10px; }
+.adm-formset-row{ display:flex; align-items:flex-start; gap:10px; background:var(--adm-surface-2); border:1px solid var(--adm-border); border-radius:10px; padding:12px; }
+.adm-formset-row input[type="checkbox"][name$="-DELETE"]{ display:none; }
+.adm-formset-fields{ flex:1; display:grid; gap:10px; }
+.adm-formset-fields.cols-2{ grid-template-columns:1fr 100px; }
+.adm-formset-fields.cols-file{ grid-template-columns:1.2fr 1.2fr 90px; }
+.adm-formset-remove{ flex-shrink:0; width:30px; height:30px; border-radius:8px; background:rgba(200,30,30,.12); border:1px solid rgba(200,30,30,.3); color:#f3a5a5; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.adm-formset-remove:hover{ background:rgba(200,30,30,.22); }
+.adm-formset-remove svg{ width:14px; height:14px; }
+.adm-formset-add{ display:inline-flex; align-items:center; gap:6px; font-size:.78rem; font-weight:600; color:#f3a5a5; background:transparent; border:1px dashed rgba(200,30,30,.4); border-radius:9px; padding:9px 14px; cursor:pointer; }
+.adm-formset-add:hover{ background:rgba(200,30,30,.08); }
+
+/* ===== SAVE BAR ===== */
+.adm-save-bar{ position:sticky; bottom:0; z-index:20; margin-top:22px; padding:14px 20px; display:flex; align-items:center; justify-content:flex-end; gap:10px; background:var(--adm-surface); border:1px solid var(--adm-border); border-radius:14px; box-shadow:0 -6px 20px rgba(0,0,0,.3); }
+.adm-save-bar .note{ margin-right:auto; font-size:.75rem; color:var(--adm-text-faint); }
+
+@media (max-width:640px){
+    .adm-form-grid{ grid-template-columns:1fr; padding:14px 16px 18px; }
+    .adm-form-group.span-2{ grid-column:span 1; }
+    .adm-formset-fields.cols-2, .adm-formset-fields.cols-file{ grid-template-columns:1fr; }
+    .adm-mkt-grid{ grid-template-columns:1fr; }
+    .adm-save-bar{ flex-wrap:wrap; }
+    .adm-save-bar .note{ width:100%; margin:0 0 6px; }
+}

@@ -1,36 +1,197 @@
 {% extends "dashboard/base_dashboard.html" %}
+{% load static dashboard_extras %}
+
+{% block title %}Pengaduan & Masukan{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/complaint.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Pengaduan & Masukan</h1>
-<table class="w-full bg-white rounded-lg shadow overflow-hidden">
-    <thead class="bg-gray-800 text-white text-left text-sm">
-        <tr><th class="p-3">Nama</th><th class="p-3">Kategori</th><th class="p-3">Pesan</th><th class="p-3">Status</th><th class="p-3">Aksi</th></tr>
-    </thead>
-    <tbody>
-        {% for p in pengaduan_list %}
-        <tr class="border-t text-sm">
-            <td class="p-3">{{ p.nama }}</td>
-            <td class="p-3">{{ p.kategori_display }}</td>
-            <td class="p-3">{{ p.pesan|truncatewords:10 }}</td>
-            <td class="p-3">
-                <form method="post" action="{% url 'dashboard:pengaduan_update_status' p.pk %}" class="inline">
+
+<div class="adm-card adm-banner">
+    <div>
+        <p class="adm-banner-eyebrow">Kelola Data</p>
+        <h1 class="adm-banner-name">Pengaduan &amp; Masukan</h1>
+        <p class="adm-banner-role">{{ total_pengaduan|id_number }} total masuk &middot; UPTD Pasar Segiri</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 adm-stats-grid">
+    <div class="adm-card adm-stat">
+        <div class="lbl"><span>Total Pengaduan</span></div>
+        <div class="val">{{ total_pengaduan|id_number }}</div>
+    </div>
+    <div class="adm-card adm-stat {% if count_baru %}urgent{% endif %}">
+        <div class="lbl">
+            <span>Baru</span>
+            {% if count_baru %}<span class="adm-badge-urgent">URGENT</span>{% endif %}
+        </div>
+        <div class="val">{{ count_baru|id_number }} <span class="unit">belum diproses</span></div>
+    </div>
+    <div class="adm-card adm-stat">
+        <div class="lbl"><span>Diproses</span></div>
+        <div class="val">{{ count_diproses|id_number }}</div>
+    </div>
+    <div class="adm-card adm-stat">
+        <div class="lbl"><span>Selesai</span></div>
+        <div class="val">{{ count_selesai|id_number }}</div>
+    </div>
+</div>
+
+<div class="adm-pgd-toolbar">
+    <div class="adm-pgd-tabs">
+        <a href="{% url 'dashboard:pengaduan_list' %}{% if date_query %}?{{ date_query }}{% endif %}" class="adm-pgd-tab {% if not status_filter %}is-active{% endif %}">
+            Semua <span>{{ total_pengaduan|id_number }}</span>
+        </a>
+        <a href="?{{ date_query }}{% if date_query %}&{% endif %}status=baru" class="adm-pgd-tab {% if status_filter == 'baru' %}is-active{% endif %}">
+            Baru <span>{{ count_baru|id_number }}</span>
+        </a>
+        <a href="?{{ date_query }}{% if date_query %}&{% endif %}status=diproses" class="adm-pgd-tab {% if status_filter == 'diproses' %}is-active{% endif %}">
+            Diproses <span>{{ count_diproses|id_number }}</span>
+        </a>
+        <a href="?{{ date_query }}{% if date_query %}&{% endif %}status=selesai" class="adm-pgd-tab {% if status_filter == 'selesai' %}is-active{% endif %}">
+            Selesai <span>{{ count_selesai|id_number }}</span>
+        </a>
+    </div>
+
+    <form method="get" class="adm-pgd-datefilter">
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+        <div class="adm-pgd-date-group">
+            <label>Dari</label>
+            <input type="date" name="dari" value="{{ dari }}" class="adm-field">
+        </div>
+        <div class="adm-pgd-date-group">
+            <label>Sampai</label>
+            <input type="date" name="sampai" value="{{ sampai }}" class="adm-field">
+        </div>
+        <button type="submit" class="adm-btn adm-btn-outline">Terapkan</button>
+        {% if dari or sampai %}
+        <a href="?{% if status_filter %}status={{ status_filter }}{% endif %}" class="adm-pgd-reset">Reset tanggal</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="adm-card adm-pgd-list">
+    {% for p in pengaduan_list %}
+    <div class="adm-pgd-row {% if not forloop.last %}has-border{% endif %}">
+        <div class="adm-pgd-left">
+            <div class="adm-avatar adm-complaint-avatar">{{ p.nama|slice:":1"|upper }}</div>
+            <div class="adm-pgd-text">
+                <div class="adm-pgd-top">
+                    <p class="adm-pgd-name">{{ p.nama }}</p>
+                    <span class="adm-pgd-cat">{{ p.kategori_display }}</span>
+                </div>
+                <p class="adm-pgd-msg">{{ p.pesan|truncatewords:18 }}</p>
+                <p class="adm-pgd-meta">
+                    {{ p.dibuat_pada|date:"d M Y, H:i" }}
+                    {% if p.lampiran %} &middot; &#128206; ada lampiran{% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="adm-pgd-right">
+            <div class="adm-pgd-dropdown" data-dropdown>
+                <button type="button" class="adm-pgd-dropdown-btn" data-dropdown-toggle>
+                    <span class="adm-status-pill st-{{ p.status }}">{{ p.get_status_display }}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <ul class="adm-pgd-dropdown-menu" data-dropdown-menu>
+                    {% for value, label in status_choices %}
+                    <li>
+                        <button type="button" class="adm-pgd-dropdown-item {% if p.status == value %}is-selected{% endif %} st-{{ value }}" data-value="{{ value }}">
+                            {{ label }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <form method="post" action="{% url 'dashboard:pengaduan_update_status' p.pk %}" class="adm-pgd-status-form" data-dropdown-form>
                     {% csrf_token %}
-                    <select name="status" onchange="this.form.submit()" class="border rounded px-2 py-1">
-                        {% for value, label in status_choices %}
-                            <option value="{{ value }}" {% if p.status == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                    <input type="hidden" name="status" value="{{ p.status }}" data-dropdown-input>
                 </form>
-            </td>
-            <td class="p-3">
-                <form method="post" action="{% url 'dashboard:pengaduan_delete' p.pk %}" onsubmit="return confirm('Hapus pengaduan ini?')" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                </form>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada pengaduan.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+            </div>
+
+            <button type="button" class="adm-btn adm-btn-ghost" onclick="openModal('modal-pengaduan-{{ p.pk }}')">Detail</button>
+
+            <form method="post" action="{% url 'dashboard:pengaduan_delete' p.pk %}" data-confirm="Hapus pengaduan dari {{ p.nama|escapejs }}? Data tidak bisa dikembalikan.">
+                {% csrf_token %}
+                <button type="submit" class="adm-btn adm-btn-danger">Hapus</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-pengaduan-{{ p.pk }}" class="adm-modal-overlay">
+        <div class="adm-modal-backdrop" onclick="closeModal('modal-pengaduan-{{ p.pk }}')"></div>
+        <div class="adm-modal-box">
+            <div class="adm-modal-head">
+                <div>
+                    <span class="adm-status-pill st-{{ p.status }}">{{ p.get_status_display }}</span>
+                    <h3>{{ p.nama }}</h3>
+                    <p class="sub">{{ p.kategori_display }} &middot; {{ p.dibuat_pada|date:"d M Y, H:i" }}</p>
+                </div>
+                <button type="button" class="adm-modal-close" onclick="closeModal('modal-pengaduan-{{ p.pk }}')">&times;</button>
+            </div>
+            <div class="adm-modal-body">
+                {% if p.telepon or p.email %}
+                <div class="adm-modal-contact">
+                    {% if p.telepon %}<span>&#128222; {{ p.telepon }}</span>{% endif %}
+                    {% if p.email %}<span>&#9993; {{ p.email }}</span>{% endif %}
+                </div>
+                {% endif %}
+                <p class="adm-modal-msg">{{ p.pesan|linebreaksbr }}</p>
+
+                {% if p.lampiran %}
+                    {% if p.is_lampiran_gambar %}
+                    <a href="{% url 'dashboard:pengaduan_lampiran_lihat' p.pk %}" target="_blank" rel="noopener" class="adm-modal-attachment-preview">
+                        <img src="{% url 'dashboard:pengaduan_lampiran_lihat' p.pk %}" alt="Lampiran dari {{ p.nama }}">
+                        <span>Klik untuk lihat ukuran penuh</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'dashboard:pengaduan_lampiran_lihat' p.pk %}" target="_blank" rel="noopener" class="adm-btn adm-btn-outline adm-modal-attachment">
+                        &#128206; Buka Lampiran
+                    </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% empty %}
+    <p class="adm-empty-note">
+        {% if status_filter or dari or sampai %}Tidak ada pengaduan yang cocok dengan filter ini.{% else %}Belum ada pengaduan masuk.{% endif %}
+    </p>
+    {% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="adm-pgd-pagination">
+    <p class="adm-page-info">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }} &middot; {{ page_obj.paginator.count|id_number }} pengaduan</p>
+    <div class="adm-page-controls">
+        {% if page_obj.has_previous %}
+        <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.previous_page_number }}" class="adm-page-btn">&larr; Sebelumnya</a>
+        {% else %}
+        <span class="adm-page-btn is-disabled">&larr; Sebelumnya</span>
+        {% endif %}
+
+        <div class="adm-page-numbers">
+            {% for num in page_range %}
+                {% if num == None %}
+                <span class="adm-page-ellipsis">&hellip;</span>
+                {% else %}
+                <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ num }}" class="adm-page-num {% if num == page_obj.number %}is-active{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_next %}
+        <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page_obj.next_page_number }}" class="adm-page-btn">Berikutnya &rarr;</a>
+        {% else %}
+        <span class="adm-page-btn is-disabled">Berikutnya &rarr;</span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<script src="{% static 'dashboard/js/complaint.js' %}" defer></script>
+
 {% endblock %}

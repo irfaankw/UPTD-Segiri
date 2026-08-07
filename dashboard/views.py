@@ -1,8 +1,17 @@
+import mimetypes
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import models
 from .decorators import staff_required
 from .forms import PasarForm, AnggotaForm, GaleriForm, ProfilUPTDForm, MisiUPTDForm
+from django import forms
+from django.forms import inlineformset_factory
+from urllib.parse import urlencode
+from django.core.paginator import Paginator
+from django.http import FileResponse, Http404
+from market.models import (
+    Pasar, FotoAktivitasPasar, SaranaFasilitas, KomoditasUnggulan, DokumenResmi,
+)
 
 from complaint.models import Pengaduan
 from market.models import Pasar
@@ -19,19 +28,18 @@ def home_dashboard(request):
     status_diproses = Pengaduan.objects.filter(status="diproses").count()
     status_selesai = Pengaduan.objects.filter(status="selesai").count()
 
-    # Breakdown per kategori, buat progress bar di kartu "Pengaduan per Kategori"
     kategori_counts = (
         Pengaduan.objects.values("kategori")
         .annotate(count=models.Count("id"))
         .order_by("-count")
     )
     kategori_label_map = dict(Pengaduan.KATEGORI_CHOICES)
-    max_count = max([k["count"] for k in kategori_counts], default=0)
+    max_kategori = max([k["count"] for k in kategori_counts], default=0)
     kategori_breakdown = [
         {
             "label": kategori_label_map.get(k["kategori"], k["kategori"]),
             "count": k["count"],
-            "percent": round((k["count"] / max_count) * 100) if max_count else 0,
+            "percent": round((k["count"] / max_kategori) * 100) if max_kategori else 0,
         }
         for k in kategori_counts
     ]
@@ -43,9 +51,12 @@ def home_dashboard(request):
         "total_pengaduan": total_pengaduan,
         "pengaduan_pending": status_baru,
 
+        # dikonsumsi via json_script di template, dibaca sama home_charts.js
         "pasar_labels": [p.nama for p in pasar_qs],
         "pasar_data": [p.jumlah_pedagang for p in pasar_qs],
+        "status_chart": {"selesai": status_selesai, "diproses": status_diproses, "baru": status_baru},
 
+        # dipakai buat teks di template (badge, legend, dst)
         "status_baru": status_baru,
         "status_diproses": status_diproses,
         "status_selesai": status_selesai,
@@ -55,17 +66,61 @@ def home_dashboard(request):
     }
     return render(request, "dashboard/home_dashboard.html", context)
 
-# ---------- PENGADUAN (sudah ada, tetap) ----------
+# ---------- PENGADUAN ----------
+def _build_page_range(current, total, window=2):
+    """Bikin daftar nomor halaman + None (buat elipsis '...') di komponen paginasi."""
+    pages = sorted(set([1, total] + list(range(max(1, current - window), min(total, current + window) + 1))))
+    result = []
+    last = 0
+    for p in pages:
+        if last and p - last > 1:
+            result.append(None)
+        result.append(p)
+        last = p
+    return result
+
 @staff_required
 def pengaduan_list(request):
-    pengaduan = Pengaduan.objects.all()
+    semua_pengaduan = Pengaduan.objects.all()
+
+    pengaduan = semua_pengaduan
     status_filter = request.GET.get("status")
     if status_filter:
         pengaduan = pengaduan.filter(status=status_filter)
+
+    dari = request.GET.get("dari", "")
+    sampai = request.GET.get("sampai", "")
+    if dari:
+        pengaduan = pengaduan.filter(dibuat_pada__date__gte=dari)
+    if sampai:
+        pengaduan = pengaduan.filter(dibuat_pada__date__lte=sampai)
+
+    paginator = Paginator(pengaduan, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    querystring = request.GET.copy()
+    querystring.pop("page", None)
+
+    date_params = {}
+    if dari:
+        date_params["dari"] = dari
+    if sampai:
+        date_params["sampai"] = sampai
+
     context = {
-        "pengaduan_list": pengaduan,
+        "pengaduan_list": page_obj,
+        "page_obj": page_obj,
+        "page_range": _build_page_range(page_obj.number, paginator.num_pages),
         "status_choices": Pengaduan.STATUS_CHOICES,
         "status_filter": status_filter,
+        "dari": dari,
+        "sampai": sampai,
+        "querystring": querystring.urlencode(),
+        "date_query": urlencode(date_params),
+        "total_pengaduan": semua_pengaduan.count(),
+        "count_baru": semua_pengaduan.filter(status="baru").count(),
+        "count_diproses": semua_pengaduan.filter(status="diproses").count(),
+        "count_selesai": semua_pengaduan.filter(status="selesai").count(),
     }
     return render(request, "dashboard/complaint_list.html", context)
 
@@ -88,29 +143,122 @@ def pengaduan_delete(request, pk):
         messages.success(request, "Pengaduan dihapus.")
     return redirect("dashboard:pengaduan_list")
 
+@staff_required
+def pengaduan_lampiran_lihat(request, pk):
+    pengaduan = get_object_or_404(Pengaduan, pk=pk)
+    if not pengaduan.lampiran:
+        raise Http404("Lampiran tidak ditemukan.")
+    content_type, _ = mimetypes.guess_type(pengaduan.lampiran.name)
+    try:
+        return FileResponse(
+            pengaduan.lampiran.open("rb"),
+            content_type=content_type or "application/octet-stream",
+        )
+    except FileNotFoundError:
+        raise Http404("Lampiran tidak ditemukan.")
+
 # ---------- UNIT PASAR ----------
+FotoAktivitasFormSet = inlineformset_factory(
+    Pasar, FotoAktivitasPasar,
+    fields=["gambar", "keterangan", "urutan"],
+    extra=1, can_delete=True,
+    widgets={
+        "gambar": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
+        "keterangan": forms.TextInput(attrs={"class": "adm-field", "placeholder": "Keterangan singkat foto"}),
+        "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
+    },
+)
+SaranaFasilitasFormSet = inlineformset_factory(
+    Pasar, SaranaFasilitas,
+    fields=["nama", "urutan"],
+    extra=1, can_delete=True,
+    widgets={
+        "nama": forms.TextInput(attrs={"class": "adm-field", "placeholder": "Nama sarana/fasilitas"}),
+        "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
+    },
+)
+KomoditasUnggulanFormSet = inlineformset_factory(
+    Pasar, KomoditasUnggulan,
+    fields=["nama", "urutan"],
+    extra=1, can_delete=True,
+    widgets={
+        "nama": forms.TextInput(attrs={"class": "adm-field", "placeholder": "Nama komoditas"}),
+        "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
+    },
+)
+DokumenResmiFormSet = inlineformset_factory(
+    Pasar, DokumenResmi,
+    fields=["judul", "file", "urutan"],
+    extra=1, can_delete=True,
+    widgets={
+        "judul": forms.TextInput(attrs={"class": "adm-field", "placeholder": "Judul dokumen"}),
+        "file": forms.FileInput(attrs={"class": "adm-file-input", "accept": "application/pdf"}),
+        "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
+    },
+)
+
 @staff_required
 def unit_pasar_list(request):
-    return render(request, "dashboard/market_list.html", {"pasar_list": Pasar.objects.all()})
+    pasar_list = list(Pasar.objects.all())
+    context = {
+        "pasar_list": pasar_list,
+        "total_pasar": len(pasar_list),
+        "total_pedagang": sum(p.jumlah_pedagang for p in pasar_list),
+        "total_video": sum(1 for p in pasar_list if p.video_profil),
+        "belum_lengkap": sum(1 for p in pasar_list if not p.foto or not p.video_profil),
+    }
+    return render(request, "dashboard/market_list.html", context)
+
+
+def _build_pasar_formsets(request, pasar=None):
+    """Helper biar create & update gak duplikat kode instansiasi formset."""
+    post = request.POST or None
+    files = request.FILES or None
+    return {
+        "foto_formset": FotoAktivitasFormSet(post, files, instance=pasar, prefix="foto"),
+        "sarana_formset": SaranaFasilitasFormSet(post, instance=pasar, prefix="sarana"),
+        "komoditas_formset": KomoditasUnggulanFormSet(post, instance=pasar, prefix="komoditas"),
+        "dokumen_formset": DokumenResmiFormSet(post, files, instance=pasar, prefix="dokumen"),
+    }
+
 
 @staff_required
 def unit_pasar_create(request):
     form = PasarForm(request.POST or None, request.FILES or None)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Unit pasar berhasil ditambahkan.")
-        return redirect("dashboard:unit_pasar_list")
-    return render(request, "dashboard/market_form.html", {"form": form, "mode": "tambah"})
+    formsets = _build_pasar_formsets(request)
+
+    if request.method == "POST":
+        if form.is_valid() and all(fs.is_valid() for fs in formsets.values()):
+            pasar = form.save()
+            for fs in formsets.values():
+                fs.instance = pasar
+                fs.save()
+            messages.success(request, "Unit pasar berhasil ditambahkan.")
+            return redirect("dashboard:unit_pasar_list")
+        messages.error(request, "Ada isian yang belum valid, silakan cek kembali form di bawah.")
+
+    context = {"form": form, "mode": "tambah", **formsets}
+    return render(request, "dashboard/market_form.html", context)
+
 
 @staff_required
 def unit_pasar_update(request, pk):
     pasar = get_object_or_404(Pasar, pk=pk)
     form = PasarForm(request.POST or None, request.FILES or None, instance=pasar)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Unit pasar berhasil diperbarui.")
-        return redirect("dashboard:unit_pasar_list")
-    return render(request, "dashboard/market_form.html", {"form": form, "mode": "edit", "pasar": pasar})
+    formsets = _build_pasar_formsets(request, pasar=pasar)
+
+    if request.method == "POST":
+        if form.is_valid() and all(fs.is_valid() for fs in formsets.values()):
+            form.save()
+            for fs in formsets.values():
+                fs.save()
+            messages.success(request, "Unit pasar berhasil diperbarui.")
+            return redirect("dashboard:unit_pasar_list")
+        messages.error(request, "Ada isian yang belum valid, silakan cek kembali form di bawah.")
+
+    context = {"form": form, "mode": "edit", "pasar": pasar, **formsets}
+    return render(request, "dashboard/market_form.html", context)
+
 
 @staff_required
 def unit_pasar_delete(request, pk):
@@ -210,6 +358,8 @@ def misi_tambah(request):
             misi.urutan = urutan_terakhir
             misi.save()
             messages.success(request, "Misi ditambahkan.")
+        else:
+            messages.error(request, "Isi misi tidak boleh kosong.")
     return redirect("dashboard:profil_uptd")
 
 @staff_required

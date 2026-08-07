@@ -1,10 +1,9 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render
-from market.models import Pasar  # <-- 1. TAMBAHKAN IMPORT INI
+from market.models import Pasar  
 from membership.models import Anggota
 
 from .models import Galeri, HeroBannerUtama, ProfilUPTD
-
 
 def home(request):
     profil = ProfilUPTD.objects.first()
@@ -35,8 +34,6 @@ def home(request):
 
 
 # --- FUNGSI DI BAWAH INI TIDAK DISENTUH ---
-
-
 def uptd_profile(request):
     profil = ProfilUPTD.objects.first()
     pimpinan_list = Anggota.objects.filter(

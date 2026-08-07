@@ -1,18 +1,351 @@
 {% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}{% if mode == "edit" %}Edit{% else %}Tambah{% endif %} Unit Pasar{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/market.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">{% if mode == "edit" %}Edit{% else %}Tambah{% endif %} Unit Pasar</h1>
-<form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow space-y-4 max-w-3xl">
-    {% csrf_token %}
-    {% for field in form %}
+
+<div class="adm-card adm-banner" style="padding:20px 24px;">
     <div>
-        <label class="block text-sm font-medium mb-1">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}<p class="text-red-600 text-xs mt-1">{{ field.errors|join:", " }}</p>{% endif %}
+        <p class="adm-banner-eyebrow">{% if mode == "edit" %}Edit Data{% else %}Data Baru{% endif %}</p>
+        <h1 class="adm-banner-name" style="font-size:1.4rem;">{% if mode == "edit" %}{{ pasar.nama }}{% else %}Tambah Unit Pasar{% endif %}</h1>
+        <p class="adm-banner-role">Lengkapi informasi, media, dan konten halaman detail unit pasar</p>
     </div>
-    {% endfor %}
-    <div class="flex gap-3 pt-2">
-        <button type="submit" class="bg-red-800 text-white px-5 py-2 rounded hover:bg-red-900">Simpan</button>
-        <a href="{% url 'dashboard:unit_pasar_list' %}" class="px-5 py-2 rounded border">Batal</a>
+    <a href="{% url 'dashboard:unit_pasar_list' %}" class="adm-banner-badge">&larr; Kembali</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate class="space-y-5">
+    {% csrf_token %}
+
+    {# ===== INFORMASI DASAR ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Informasi Dasar</h2><p>Data utama yang tampil di daftar &amp; halaman publik</p></div>
+        <div class="adm-form-grid">
+            <div class="adm-form-group span-2">
+                <label for="{{ form.nama.id_for_label }}">Nama Unit Pasar</label>
+                {{ form.nama }}
+                {% if form.nama.errors %}<p class="err">{{ form.nama.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="adm-form-group span-2">
+                <label for="{{ form.alamat.id_for_label }}">Alamat</label>
+                {{ form.alamat }}
+                {% if form.alamat.errors %}<p class="err">{{ form.alamat.errors|join:", " }}</p>{% endif %}
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.kelas.id_for_label }}">Klasifikasi Unit</label>
+                {{ form.kelas }}
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.jumlah_pedagang.id_for_label }}">Jumlah Pedagang Terdaftar</label>
+                {{ form.jumlah_pedagang }}
+                <p class="hint">Update manual sesuai rekap terbaru.</p>
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.jam_operasional.id_for_label }}">Jam Operasional</label>
+                {{ form.jam_operasional }}
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.urutan.id_for_label }}">Urutan Tampil</label>
+                {{ form.urutan }}
+                <p class="hint">Angka kecil tampil lebih dulu.</p>
+            </div>
+            <div class="adm-form-group span-2">
+                <label for="{{ form.foto.id_for_label }}">Foto Utama</label>
+                {{ form.foto }}
+                {% if pasar.foto %}
+                <div class="adm-file-preview">
+                    <img src="{{ pasar.foto.url }}" alt="Foto saat ini">
+                    <span class="name">File saat ini &mdash; upload baru untuk mengganti.</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ===== VIDEO PROFIL ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Video Profil</h2><p>Video di-host offline (bukan YouTube), maks 45MB format MP4/WebM</p></div>
+        <div class="adm-form-grid">
+            <div class="adm-form-group">
+                <label for="{{ form.video_profil.id_for_label }}">File Video</label>
+                {{ form.video_profil }}
+                {% if form.video_profil.errors %}<p class="err">{{ form.video_profil.errors|join:", " }}</p>{% endif %}
+                {% if pasar.video_profil %}
+                <div class="adm-file-preview"><a href="{{ pasar.video_profil.url }}" target="_blank">Lihat video saat ini &rarr;</a></div>
+                {% endif %}
+                <p class="hint">Kompres dulu ke H.264 720p pakai HandBrake/ffmpeg sebelum upload.</p>
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.video_thumbnail.id_for_label }}">Thumbnail Video</label>
+                {{ form.video_thumbnail }}
+                {% if pasar.video_thumbnail %}
+                <div class="adm-file-preview">
+                    <img src="{{ pasar.video_thumbnail.url }}" alt="Thumbnail saat ini">
+                    <span class="name">Thumbnail saat ini</span>
+                </div>
+                {% endif %}
+                <p class="hint">Kosongkan untuk otomatis pakai foto utama sebagai fallback.</p>
+            </div>
+        </div>
+    </div>
+
+    {# ===== KONTEN HALAMAN DETAIL ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Konten Halaman Detail</h2><p>Paragraf yang tampil di halaman publik unit pasar</p></div>
+        <div class="adm-form-grid is-single">
+            <div class="adm-form-group">
+                <label for="{{ form.deskripsi.id_for_label }}">Informasi Unit Pasar (Deskripsi)</label>
+                {{ form.deskripsi }}
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.sejarah_fungsi.id_for_label }}">Sejarah &amp; Fungsi</label>
+                {{ form.sejarah_fungsi }}
+            </div>
+            <div class="adm-form-group">
+                <label for="{{ form.ekosistem_pedagang.id_for_label }}">Ekosistem Pedagang</label>
+                {{ form.ekosistem_pedagang }}
+            </div>
+        </div>
+    </div>
+
+    {# ===== LOKASI ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Lokasi</h2><p>Google Maps untuk halaman publik</p></div>
+        <div class="adm-form-grid">
+            <div class="adm-form-group span-2">
+                <label for="{{ form.google_maps_embed_url.id_for_label }}">Embed URL Google Maps</label>
+                {{ form.google_maps_embed_url }}
+                <p class="hint">Google Maps &rarr; Share &rarr; Embed a map &rarr; copy src iframe.</p>
+            </div>
+            <div class="adm-form-group span-2">
+                <label for="{{ form.google_maps_link.id_for_label }}">Link Google Maps</label>
+                {{ form.google_maps_link }}
+            </div>
+        </div>
+    </div>
+
+    {# ===== STRUKTUR ORGANISASI ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Struktur Organisasi</h2><p>Gambar bagan struktur, tampil via modal di halaman publik</p></div>
+        <div class="adm-form-grid is-single">
+            <div class="adm-form-group">
+                <label for="{{ form.struktur_organisasi_image.id_for_label }}">Gambar Struktur</label>
+                {{ form.struktur_organisasi_image }}
+                {% if pasar.struktur_organisasi_image %}
+                <div class="adm-file-preview">
+                    <img src="{{ pasar.struktur_organisasi_image.url }}" alt="Struktur saat ini">
+                    <span class="name">Gambar saat ini</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ===== KOMODITAS UNGGULAN (formset) ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Komoditas Unggulan</h2><p>Tag komoditas yang tampil di halaman publik</p></div>
+        {{ komoditas_formset.management_form }}
+        <div class="adm-formset-body" id="komoditas-formset-body">
+            {% for kf in komoditas_formset %}
+            <div class="adm-formset-row">
+                {{ kf.id }}
+                <div class="adm-formset-fields cols-2">
+                    <div class="adm-form-group">{% if forloop.first %}<label>Nama Komoditas</label>{% endif %}{{ kf.nama }}</div>
+                    <div class="adm-form-group">{% if forloop.first %}<label>Urutan</label>{% endif %}{{ kf.urutan }}</div>
+                </div>
+                {{ kf.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="padding:0 22px 20px;">
+            <button type="button" class="adm-formset-add" data-formset-add="komoditas">+ Tambah Komoditas</button>
+        </div>
+        <template id="empty-form-komoditas">
+            <div class="adm-formset-row">
+                <div class="adm-formset-fields cols-2">
+                    <div class="adm-form-group">{{ komoditas_formset.empty_form.nama }}</div>
+                    <div class="adm-form-group">{{ komoditas_formset.empty_form.urutan }}</div>
+                </div>
+                {{ komoditas_formset.empty_form.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    {# ===== SARANA & FASILITAS (formset) ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Sarana &amp; Fasilitas</h2><p>Daftar fasilitas yang tersedia di unit pasar ini</p></div>
+        {{ sarana_formset.management_form }}
+        <div class="adm-formset-body" id="sarana-formset-body">
+            {% for sf in sarana_formset %}
+            <div class="adm-formset-row">
+                {{ sf.id }}
+                <div class="adm-formset-fields cols-2">
+                    <div class="adm-form-group">{% if forloop.first %}<label>Nama Sarana</label>{% endif %}{{ sf.nama }}</div>
+                    <div class="adm-form-group">{% if forloop.first %}<label>Urutan</label>{% endif %}{{ sf.urutan }}</div>
+                </div>
+                {{ sf.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="padding:0 22px 20px;">
+            <button type="button" class="adm-formset-add" data-formset-add="sarana">+ Tambah Sarana</button>
+        </div>
+        <template id="empty-form-sarana">
+            <div class="adm-formset-row">
+                <div class="adm-formset-fields cols-2">
+                    <div class="adm-form-group">{{ sarana_formset.empty_form.nama }}</div>
+                    <div class="adm-form-group">{{ sarana_formset.empty_form.urutan }}</div>
+                </div>
+                {{ sarana_formset.empty_form.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    {# ===== FOTO AKTIVITAS PASAR (formset) ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Foto Aktivitas Pasar</h2><p>Galeri foto yang tampil di sidebar halaman publik</p></div>
+        {{ foto_formset.management_form }}
+        <div class="adm-formset-body" id="foto-formset-body">
+            {% for ff in foto_formset %}
+            <div class="adm-formset-row">
+                {{ ff.id }}
+                <div class="adm-formset-fields cols-file">
+                    <div class="adm-form-group">
+                        {% if forloop.first %}<label>Gambar</label>{% endif %}
+                        {{ ff.gambar }}
+                        {% if ff.instance.gambar %}<div class="adm-file-preview"><img src="{{ ff.instance.gambar.url }}" alt=""></div>{% endif %}
+                    </div>
+                    <div class="adm-form-group">{% if forloop.first %}<label>Keterangan</label>{% endif %}{{ ff.keterangan }}</div>
+                    <div class="adm-form-group">{% if forloop.first %}<label>Urutan</label>{% endif %}{{ ff.urutan }}</div>
+                </div>
+                {{ ff.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="padding:0 22px 20px;">
+            <button type="button" class="adm-formset-add" data-formset-add="foto">+ Tambah Foto</button>
+        </div>
+        <template id="empty-form-foto">
+            <div class="adm-formset-row">
+                <div class="adm-formset-fields cols-file">
+                    <div class="adm-form-group">{{ foto_formset.empty_form.gambar }}</div>
+                    <div class="adm-form-group">{{ foto_formset.empty_form.keterangan }}</div>
+                    <div class="adm-form-group">{{ foto_formset.empty_form.urutan }}</div>
+                </div>
+                {{ foto_formset.empty_form.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    {# ===== DOKUMEN RESMI (formset) ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head"><h2>Dokumen Resmi</h2><p>File PDF yang bisa dilihat/diunduh publik</p></div>
+        {{ dokumen_formset.management_form }}
+        <div class="adm-formset-body" id="dokumen-formset-body">
+            {% for df in dokumen_formset %}
+            <div class="adm-formset-row">
+                {{ df.id }}
+                <div class="adm-formset-fields cols-file">
+                    <div class="adm-form-group">{% if forloop.first %}<label>Judul</label>{% endif %}{{ df.judul }}</div>
+                    <div class="adm-form-group">
+                        {% if forloop.first %}<label>File PDF</label>{% endif %}
+                        {{ df.file }}
+                        {% if df.instance.file %}<div class="adm-file-preview"><a href="{{ df.instance.file.url }}" target="_blank">Lihat file saat ini &rarr;</a></div>{% endif %}
+                    </div>
+                    <div class="adm-form-group">{% if forloop.first %}<label>Urutan</label>{% endif %}{{ df.urutan }}</div>
+                </div>
+                {{ df.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="padding:0 22px 20px;">
+            <button type="button" class="adm-formset-add" data-formset-add="dokumen">+ Tambah Dokumen</button>
+        </div>
+        <template id="empty-form-dokumen">
+            <div class="adm-formset-row">
+                <div class="adm-formset-fields cols-file">
+                    <div class="adm-form-group">{{ dokumen_formset.empty_form.judul }}</div>
+                    <div class="adm-form-group">{{ dokumen_formset.empty_form.file }}</div>
+                    <div class="adm-form-group">{{ dokumen_formset.empty_form.urutan }}</div>
+                </div>
+                {{ dokumen_formset.empty_form.DELETE }}
+                <button type="button" class="adm-formset-remove" data-formset-remove title="Hapus baris">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    <div class="adm-save-bar">
+        <p class="note">Pastikan video &amp; gambar sudah dikompres sebelum upload.</p>
+        <a href="{% url 'dashboard:unit_pasar_list' %}" class="adm-btn adm-btn-outline">Batal</a>
+        <button type="submit" class="adm-btn adm-btn-primary">Simpan Unit Pasar</button>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const formsetConfigs = ['komoditas', 'sarana', 'foto', 'dokumen'];
+
+    formsetConfigs.forEach(prefix => {
+        const body = document.getElementById(`${prefix}-formset-body`);
+        const totalFormsInput = document.querySelector(`input[name="${prefix}-TOTAL_FORMS"]`);
+        const addBtn = document.querySelector(`[data-formset-add="${prefix}"]`);
+        const emptyTemplate = document.getElementById(`empty-form-${prefix}`);
+        if (!body || !totalFormsInput) return;
+
+        function bindRemove(row) {
+            const btn = row.querySelector('[data-formset-remove]');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const deleteInput = row.querySelector('input[name$="-DELETE"]');
+                if (deleteInput) deleteInput.checked = true;
+                row.style.display = 'none';
+            });
+        }
+
+        body.querySelectorAll('.adm-formset-row').forEach(bindRemove);
+
+        if (addBtn && emptyTemplate) {
+            addBtn.addEventListener('click', () => {
+                const currentTotal = parseInt(totalFormsInput.value, 10);
+                const html = emptyTemplate.innerHTML.trim().replaceAll('__prefix__', currentTotal);
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                const newRow = wrapper.firstElementChild;
+                body.appendChild(newRow);
+                bindRemove(newRow);
+                totalFormsInput.value = currentTotal + 1;
+            });
+        }
+    });
+});
+</script>
+
 {% endblock %}

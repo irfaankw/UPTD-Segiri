@@ -17,6 +17,7 @@ urlpatterns = [
     path('pengaduan/', views.pengaduan_list, name='pengaduan_list'),
     path('pengaduan/<int:pk>/status/', views.pengaduan_update_status, name='pengaduan_update_status'),
     path('pengaduan/<int:pk>/hapus/', views.pengaduan_delete, name='pengaduan_delete'),
+    path('pengaduan/<int:pk>/lampiran/', views.pengaduan_lampiran_lihat, name='pengaduan_lampiran_lihat'),
 
     # Unit Pasar
     path('unit-pasar/', views.unit_pasar_list, name='unit_pasar_list'),

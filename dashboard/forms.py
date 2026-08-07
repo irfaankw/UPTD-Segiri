@@ -9,10 +9,21 @@ class PasarForm(forms.ModelForm):
         model = Pasar
         exclude = ["slug"]
         widgets = {
-            "alamat": forms.Textarea(attrs={"rows": 3}),
-            "deskripsi": forms.Textarea(attrs={"rows": 4}),
-            "sejarah_fungsi": forms.Textarea(attrs={"rows": 4}),
-            "ekosistem_pedagang": forms.Textarea(attrs={"rows": 4}),
+            "nama": forms.TextInput(attrs={"class": "adm-field"}),
+            "alamat": forms.Textarea(attrs={"class": "adm-field", "rows": 3}),
+            "foto": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
+            "jumlah_pedagang": forms.NumberInput(attrs={"class": "adm-field"}),
+            "kelas": forms.Select(attrs={"class": "adm-field"}),
+            "jam_operasional": forms.TextInput(attrs={"class": "adm-field"}),
+            "deskripsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
+            "video_profil": forms.FileInput(attrs={"class": "adm-file-input", "accept": "video/mp4,video/webm"}),
+            "video_thumbnail": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
+            "sejarah_fungsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "ekosistem_pedagang": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "google_maps_embed_url": forms.TextInput(attrs={"class": "adm-field"}),
+            "google_maps_link": forms.TextInput(attrs={"class": "adm-field"}),
+            "struktur_organisasi_image": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
         }
         error_messages = {
             "nama": {"required": "Nama unit pasar tidak boleh kosong."},
@@ -55,20 +66,20 @@ class ProfilUPTDForm(forms.ModelForm):
         model = ProfilUPTD
         exclude = []
         widgets = {
-            "sambutan_judul": forms.TextInput(attrs={"class": "adm-field"}),
-            "sambutan_isi": forms.Textarea(attrs={"class": "adm-field", "rows": 5}),
-            "nama_kepala": forms.TextInput(attrs={"class": "adm-field"}),
-            "jabatan_kepala": forms.TextInput(attrs={"class": "adm-field"}),
-            "foto_kepala": forms.FileInput(attrs={"class": "adm-file-input"}),
-            "visi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
-            "struktur_organisasi": forms.FileInput(attrs={"class": "adm-file-input"}),
-            "alamat": forms.Textarea(attrs={"class": "adm-field", "rows": 3}),
-            "google_maps_embed_url": forms.TextInput(attrs={"class": "adm-field"}),
-            "google_maps_link": forms.TextInput(attrs={"class": "adm-field"}),
-            "jam_senin_kamis": forms.TextInput(attrs={"class": "adm-field"}),
-            "jam_jumat": forms.TextInput(attrs={"class": "adm-field"}),
-            "jam_sabtu": forms.TextInput(attrs={"class": "adm-field"}),
-            "jam_minggu": forms.TextInput(attrs={"class": "adm-field"}),
+            "sambutan_judul": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "sambutan_isi": forms.Textarea(attrs={"class": "adm-field", "rows": 5, "form": "profilForm"}),
+            "nama_kepala": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "jabatan_kepala": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "foto_kepala": forms.FileInput(attrs={"class": "adm-file-input", "form": "profilForm"}),
+            "visi": forms.Textarea(attrs={"class": "adm-field", "rows": 4, "form": "profilForm"}),
+            "struktur_organisasi": forms.FileInput(attrs={"class": "adm-file-input", "form": "profilForm"}),
+            "alamat": forms.Textarea(attrs={"class": "adm-field", "rows": 3, "form": "profilForm"}),
+            "google_maps_embed_url": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "google_maps_link": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "jam_senin_kamis": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "jam_jumat": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "jam_sabtu": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
+            "jam_minggu": forms.TextInput(attrs={"class": "adm-field", "form": "profilForm"}),
         }
         error_messages = {
             "sambutan_judul": {"required": "Judul sambutan tidak boleh kosong."},
@@ -90,7 +101,6 @@ class ProfilUPTDForm(forms.ModelForm):
             "jam_sabtu": {"required": "Jam operasional Sabtu tidak boleh kosong."},
             "jam_minggu": {"required": "Jam operasional Minggu tidak boleh kosong."},
         }
-
 
 class MisiUPTDForm(forms.ModelForm):
     class Meta:

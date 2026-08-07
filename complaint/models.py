@@ -40,5 +40,11 @@ class Pengaduan(models.Model):
             return f"Lainnya: {self.kategori_lainnya}"
         return self.get_kategori_display()
 
+    def is_lampiran_gambar(self):
+        """True jika lampiran berformat gambar (dipakai buat render inline di modal admin)."""
+        if not self.lampiran:
+            return False
+        return self.lampiran.name.lower().endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+
     def __str__(self):
         return f"{self.nama} - {self.kategori_display()} ({self.dibuat_pada:%d %b %Y})"

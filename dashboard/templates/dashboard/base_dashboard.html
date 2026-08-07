@@ -28,7 +28,7 @@
             --adm-header-h:64px;
         }
         body.adm-body{ background:var(--adm-bg); color:var(--adm-text); font-family:'Public Sans', ui-sans-serif, system-ui, sans-serif; margin:0; }
-
+        button, select, input, textarea { font: inherit; color: inherit; }
         .adm-app{ display:flex; flex-direction:column; min-height:100vh; }
 
         .adm-headerbar{ position:sticky; top:0; z-index:50; display:flex; height:var(--adm-header-h); }
@@ -111,6 +111,41 @@
         .adm-main{ flex:1; min-width:0; }
         .adm-content{ padding:22px 24px 40px; }
 
+        /* ---------- Toast (pengganti alert default) — GLOBAL, bukan cuma mobile ---------- */
+        .adm-toast-container{
+            position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:80;
+            display:flex; flex-direction:column; gap:10px; width:min(400px,90vw); pointer-events:none;
+        }
+        .adm-toast{
+            pointer-events:auto; display:flex; align-items:flex-start; gap:10px; padding:13px 14px;
+            border-radius:12px; background:var(--adm-surface); border:1px solid var(--adm-border);
+            box-shadow:0 12px 32px rgba(0,0,0,.45);
+            opacity:0; transform:translateY(-12px) scale(.97); transition:opacity .25s ease, transform .25s ease;
+        }
+        .adm-toast.is-visible{ opacity:1; transform:translateY(0) scale(1); }
+        .adm-toast-icon{ flex-shrink:0; margin-top:1px; }
+        .adm-toast-text{ flex:1; font-size:.83rem; line-height:1.45; color:var(--adm-text); }
+        .adm-toast-close{ flex-shrink:0; background:none; border:none; color:var(--adm-text-faint); font-size:1.15rem; line-height:1; cursor:pointer; padding:0 2px; }
+        .adm-toast-close:hover{ color:#fff; }
+        .adm-toast-success{ border-left:3px solid var(--adm-green); } .adm-toast-success .adm-toast-icon{ color:var(--adm-green); }
+        .adm-toast-error{ border-left:3px solid var(--adm-red-bright); } .adm-toast-error .adm-toast-icon{ color:var(--adm-red-bright); }
+        .adm-toast-warning{ border-left:3px solid var(--adm-yellow); } .adm-toast-warning .adm-toast-icon{ color:var(--adm-yellow); }
+        .adm-toast-info{ border-left:3px solid var(--adm-blue); } .adm-toast-info .adm-toast-icon{ color:var(--adm-blue); }
+
+        /* ===== KONFIRMASI KUSTOM (pengganti confirm() bawaan browser) ===== */
+        .adm-confirm-overlay{ display:none; position:fixed; inset:0; z-index:90; align-items:center; justify-content:center; padding:16px; }
+        .adm-confirm-overlay.is-open{ display:flex; }
+        .adm-confirm-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(2px); }
+        .adm-confirm-box{ position:relative; width:100%; max-width:380px; background:var(--adm-surface); border:1px solid var(--adm-border); border-radius:14px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+        .adm-confirm-box h3{ font-size:1.05rem; font-weight:700; margin:0 0 8px; }
+        .adm-confirm-box p{ font-size:.85rem; color:var(--adm-text-dim); margin:0 0 20px; line-height:1.5; }
+        .adm-confirm-actions{ display:flex; justify-content:flex-end; gap:10px; }
+        .adm-confirm-actions .adm-btn{ display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:600; padding:8px 16px; border-radius:9px; border:1px solid transparent; cursor:pointer; text-decoration:none; }
+        .adm-confirm-actions .adm-btn-outline{ background:var(--adm-surface-2); border-color:var(--adm-border); color:var(--adm-text); }
+        .adm-confirm-actions .adm-btn-outline:hover{ border-color:var(--adm-text-dim); }
+        .adm-confirm-actions .adm-btn-danger{ background:var(--adm-red-bright); color:#fff; }
+        .adm-confirm-actions .adm-btn-danger:hover{ opacity:.9; }
+
         @media (min-width:768px){
             .adm-backdrop{ display:none; }
             .adm-app.is-collapsed .adm-corner{ width:var(--adm-sidebar-w-collapsed); justify-content:center; padding:0; }
@@ -132,27 +167,6 @@
             .adm-sidebar.is-open{ transform:translateX(0); }
             .adm-content{ padding:18px 16px 32px; }
             .adm-search{ max-width:none; }
-
-        /* ---------- Toast (pengganti alert default) ---------- */
-        .adm-toast-container{
-            position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:80;
-            display:flex; flex-direction:column; gap:10px; width:min(400px,90vw); pointer-events:none;
-        }
-        .adm-toast{
-            pointer-events:auto; display:flex; align-items:flex-start; gap:10px; padding:13px 14px;
-            border-radius:12px; background:var(--adm-surface); border:1px solid var(--adm-border);
-            box-shadow:0 12px 32px rgba(0,0,0,.45);
-            opacity:0; transform:translateY(-12px) scale(.97); transition:opacity .25s ease, transform .25s ease;
-        }
-        .adm-toast.is-visible{ opacity:1; transform:translateY(0) scale(1); }
-        .adm-toast-icon{ flex-shrink:0; margin-top:1px; }
-        .adm-toast-text{ flex:1; font-size:.83rem; line-height:1.45; color:var(--adm-text); }
-        .adm-toast-close{ flex-shrink:0; background:none; border:none; color:var(--adm-text-faint); font-size:1.15rem; line-height:1; cursor:pointer; padding:0 2px; }
-        .adm-toast-close:hover{ color:#fff; }
-        .adm-toast-success{ border-left:3px solid var(--adm-green); } .adm-toast-success .adm-toast-icon{ color:var(--adm-green); }
-        .adm-toast-error{ border-left:3px solid var(--adm-red-bright); } .adm-toast-error .adm-toast-icon{ color:var(--adm-red-bright); }
-        .adm-toast-warning{ border-left:3px solid var(--adm-yellow); } .adm-toast-warning .adm-toast-icon{ color:var(--adm-yellow); }
-        .adm-toast-info{ border-left:3px solid var(--adm-blue); } .adm-toast-info .adm-toast-icon{ color:var(--adm-blue); }
         }
     </style>
 </head>
@@ -163,6 +177,17 @@
         [{% for message in messages %}{"tags": "{{ message.tags|escapejs }}", "text": "{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
     </script>
     {% endif %}
+    <div id="adm-confirm-overlay" class="adm-confirm-overlay">
+        <div class="adm-confirm-backdrop"></div>
+        <div class="adm-confirm-box">
+            <h3>Konfirmasi</h3>
+            <p id="adm-confirm-message"></p>
+            <div class="adm-confirm-actions">
+                <button type="button" id="adm-confirm-cancel" class="adm-btn adm-btn-outline">Batal</button>
+                <button type="button" id="adm-confirm-ok" class="adm-btn adm-btn-danger">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
     {% if user.is_authenticated %}
     <div class="adm-app" id="admApp">
         <div class="adm-headerbar">
@@ -195,11 +220,6 @@
 
             <main class="adm-main">
                 <div class="adm-content">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="mb-4 px-4 py-2 rounded-lg text-sm" style="background:rgba(59,130,246,.12); color:#93c5fd; border:1px solid rgba(59,130,246,.3);">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
                     {% block content %}{% endblock %}
                 </div>
             </main>
@@ -207,32 +227,32 @@
     </div>
 
     <script>
-        const app      = document.getElementById('admApp');
-        const sidebar  = document.getElementById('admSidebar');
-        const backdrop = document.getElementById('admBackdrop');
-        const burger   = document.getElementById('admBurger');
-        const isDesktop = () => window.innerWidth >= 768;
+    const app      = document.getElementById('admApp');
+    const sidebar  = document.getElementById('admSidebar');
+    const backdrop = document.getElementById('admBackdrop');
+    const burger   = document.getElementById('admBurger');
+    const isDesktop = () => window.innerWidth >= 768;
 
-        function openMobile(){ sidebar.classList.add('is-open'); backdrop.classList.add('is-open'); }
-        function closeMobile(){ sidebar.classList.remove('is-open'); backdrop.classList.remove('is-open'); }
+    function openMobile(){ sidebar.classList.add('is-open'); backdrop.classList.add('is-open'); }
+    function closeMobile(){ sidebar.classList.remove('is-open'); backdrop.classList.remove('is-open'); }
 
-        function toggleSidebar(){
-            if (isDesktop()) {
-                const collapsed = app.classList.toggle('is-collapsed');
-                localStorage.setItem('admSidebarCollapsed', collapsed ? '1' : '0');
-            } else {
-                sidebar.classList.contains('is-open') ? closeMobile() : openMobile();
-            }
+    function toggleSidebar(){
+        if (isDesktop()) {
+            const collapsed = app.classList.toggle('is-collapsed');
+            localStorage.setItem('admSidebarCollapsed', collapsed ? '1' : '0');
+        } else {
+            sidebar.classList.contains('is-open') ? closeMobile() : openMobile();
         }
+    }
 
-        burger.addEventListener('click', toggleSidebar);
-        backdrop.addEventListener('click', closeMobile);
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobile(); });
-        window.addEventListener('resize', () => { if (isDesktop()) closeMobile(); });
+    burger.addEventListener('click', toggleSidebar);
+    backdrop.addEventListener('click', closeMobile);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobile(); });
+    window.addEventListener('resize', () => { if (isDesktop()) closeMobile(); });
 
-        if (isDesktop() && localStorage.getItem('admSidebarCollapsed') === '1') {
-            app.classList.add('is-collapsed');
-        }
+    if (isDesktop() && localStorage.getItem('admSidebarCollapsed') === '1') {
+        app.classList.add('is-collapsed');
+    }
 
     (function () {
         const container = document.getElementById('adm-toast-container');
@@ -269,6 +289,42 @@
         }
 
         items.forEach((m, i) => setTimeout(() => showAdmToast(m.tags, m.text), i * 150));
+    })();
+
+    (function () {
+        const overlay = document.getElementById('adm-confirm-overlay');
+        const msgEl = document.getElementById('adm-confirm-message');
+        const okBtn = document.getElementById('adm-confirm-ok');
+        const cancelBtn = document.getElementById('adm-confirm-cancel');
+        let pendingForm = null;
+
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (form.hasAttribute('data-confirm')) {
+                e.preventDefault();
+                pendingForm = form;
+                msgEl.textContent = form.getAttribute('data-confirm');
+                overlay.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        function closeConfirm() {
+            overlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+            pendingForm = null;
+        }
+
+        okBtn.addEventListener('click', function () {
+            if (pendingForm) {
+                const form = pendingForm;
+                closeConfirm();
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        });
+        cancelBtn.addEventListener('click', closeConfirm);
+        overlay.querySelector('.adm-confirm-backdrop').addEventListener('click', closeConfirm);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeConfirm(); });
     })();
     </script>
     {% else %}

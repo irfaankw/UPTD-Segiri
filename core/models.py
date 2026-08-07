@@ -28,7 +28,7 @@ class ProfilUPTD(models.Model):
         help_text="URL src dari iframe embed Google Maps (Share > Embed a map)"
     )
     google_maps_link = models.URLField(
-        max_length=500, 
+        max_length=500,
         help_text="Link biasa Google Maps (buat tombol 'Buka di Google Maps')"
     )
 
@@ -88,12 +88,13 @@ class Galeri(models.Model):
 
     def __str__(self):
         return f"{self.judul} - {self.get_kategori_display()}"
-    
+
+
 class HeroBannerUtama(models.Model):
     gambar = models.ImageField(
-        upload_to='hero_banners/', 
-        blank=True, 
-        null=True, 
+        upload_to='hero_banners/',
+        blank=True,
+        null=True,
         help_text="Gambar Banner Utama (Slide 1 Beranda)"
     )
 
