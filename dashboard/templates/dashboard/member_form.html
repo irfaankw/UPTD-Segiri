@@ -1,31 +1,252 @@
-{% extends "dashboard/base_dashboard.html" %}
+{% extends 'dashboard/base_dashboard.html' %}
+
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Anggota</h1>
-    <a href="{% url 'dashboard:anggota_create' %}" class="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900">+ Tambah Anggota</a>
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Breadcrumb & Header -->
+    <div class="space-y-2">
+        <nav class="flex text-xs text-gray-400 gap-2">
+            <a href="{% url 'dashboard:anggota_list' %}" class="hover:text-white transition">Anggota</a>
+            <span>&rsaquo;</span>
+            <span class="text-gray-200 font-medium">{% if mode == 'edit' %}Edit Anggota{% else %}Tambah Anggota{% endif %}</span>
+        </nav>
+        
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-white tracking-wide">
+                    {% if mode == 'edit' %}Edit Anggota: <span class="text-red-500">{{ anggota.nama }}</span>{% else %}Tambah Anggota Baru{% endif %}
+                </h1>
+                <p class="text-sm text-gray-400 mt-0.5">Lengkapi informasi detail untuk menambahkan personel ke dalam sistem.</p>
+            </div>
+            
+            <div class="w-10 h-10 rounded-xl bg-zinc-800/80 border border-zinc-700/60 flex items-center justify-center text-gray-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Utama -->
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {% csrf_token %}
+
+        <!-- KOLOM KIRI (Informasi Pribadi & Keterangan Tambahan + Sambutan & Uraian Tugas) -->
+        <div class="lg:col-span-6 space-y-6">
+            
+            <!-- CARD 1: Informasi Pribadi -->
+            <div class="bg-[#18181b] p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-950/50 border border-red-800/40 flex items-center justify-center text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3 3 0 00-3 3b2 2 0 002 2h6a2 2 0 002-2 3 3 0 00-3-3H9z"></path></svg>
+                    </div>
+                    <h2 class="font-semibold text-white text-sm">Informasi Pribadi</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    <!-- Upload Foto -->
+                    <div class="sm:col-span-5 space-y-1.5">
+                        <label class="block text-xs font-medium text-gray-300">Foto Profil</label>
+                        <div class="relative group">
+                            <div class="w-full h-32 bg-[#27272a] border-2 border-dashed border-zinc-700 hover:border-red-600/60 rounded-xl flex flex-col items-center justify-center p-2 text-center transition cursor-pointer overflow-hidden">
+                                {% if form.instance.foto %}
+                                    <img src="{{ form.instance.foto.url }}" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition">
+                                {% endif %}
+                                <div class="w-8 h-8 rounded-lg bg-red-600/90 text-white flex items-center justify-center mb-1 shadow-lg relative z-10">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                </div>
+                                <span class="text-xs font-medium text-white relative z-10">Unggah Foto</span>
+                            </div>
+                            <div class="mt-1 opacity-0 absolute inset-0 pointer-events-auto">
+                                {{ form.foto }}
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Format JPG/PNG, Max 2MB.</p>
+                        {% if form.foto.errors %}<p class="text-red-400 text-xs mt-1">{{ form.foto.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <!-- Input Nama & NIP -->
+                    <div class="sm:col-span-7 space-y-3">
+                        {% if form.nama %}
+                        <div>
+                            <label for="{{ form.nama.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                                {{ form.nama.label }} {% if form.nama.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                                {{ form.nama }}
+                            </div>
+                            {% if form.nama.errors %}<p class="text-red-400 text-xs mt-1">{{ form.nama.errors.0 }}</p>{% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if form.nip %}
+                        <div>
+                            <label for="{{ form.nip.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                                {{ form.nip.label }}
+                            </label>
+                            <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                                {{ form.nip }}
+                            </div>
+                            <p class="text-[10px] text-gray-500 mt-1">Biarkan kosong jika non-PNS/honor.</p>
+                            {% if form.nip.errors %}<p class="text-red-400 text-xs mt-1">{{ form.nip.errors.0 }}</p>{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: Keterangan Tambahan, Sambutan & Uraian Tugas -->
+            <div class="bg-[#18181b] p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-950/50 border border-red-800/40 flex items-center justify-center text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h2 class="font-semibold text-white text-sm">Keterangan & Tugas</h2>
+                </div>
+
+                <!-- Bio / Deskripsi Singkat -->
+                {% if form.bio or form.deskripsi %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Bio / Deskripsi Singkat</label>
+                    <div class="[&_textarea]:w-full [&_textarea]:bg-[#27272a] [&_textarea]:border [&_textarea]:border-zinc-700/80 [&_textarea]:rounded-xl [&_textarea]:p-2.5 [&_textarea]:text-xs [&_textarea]:text-white [&_textarea]:focus:outline-none [&_textarea]:focus:border-red-600 [&_textarea]:rows-2">
+                        {% if form.bio %}{{ form.bio }}{% else %}{{ form.deskripsi }}{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Sambutan Singkat -->
+                {% if form.sambutan_singkat or form.sambutan %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Sambutan Singkat</label>
+                    <div class="[&_textarea]:w-full [&_textarea]:bg-[#27272a] [&_textarea]:border [&_textarea]:border-zinc-700/80 [&_textarea]:rounded-xl [&_textarea]:p-2.5 [&_textarea]:text-xs [&_textarea]:text-white [&_textarea]:focus:outline-none [&_textarea]:focus:border-red-600 [&_textarea]:rows-2">
+                        {% if form.sambutan_singkat %}{{ form.sambutan_singkat }}{% else %}{{ form.sambutan }}{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Uraian Tugas -->
+                {% if form.uraian_tugas or form.tugas %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Uraian Tugas</label>
+                    <div class="[&_textarea]:w-full [&_textarea]:bg-[#27272a] [&_textarea]:border [&_textarea]:border-zinc-700/80 [&_textarea]:rounded-xl [&_textarea]:p-2.5 [&_textarea]:text-xs [&_textarea]:text-white [&_textarea]:focus:outline-none [&_textarea]:focus:border-red-600 [&_textarea]:rows-3">
+                        {% if form.uraian_tugas %}{{ form.uraian_tugas }}{% else %}{{ form.tugas }}{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- KOLOM KANAN (Penugasan & Lokasi & Status) -->
+        <div class="lg:col-span-6 space-y-6">
+            
+            <!-- CARD 3: Penugasan & Status -->
+            <div class="bg-[#18181b] p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-zinc-800/80 pb-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-950/50 border border-red-800/40 flex items-center justify-center text-red-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <h2 class="font-semibold text-white text-sm">Penugasan & Status</h2>
+                </div>
+
+                <!-- Jabatan & Kategori -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% if form.jabatan %}
+                    <div>
+                        <label for="{{ form.jabatan.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                            {{ form.jabatan.label }} {% if form.jabatan.field.required %}<span class="text-red-500">*</span>{% endif %}
+                        </label>
+                        <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                            {{ form.jabatan }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.kategori %}
+                    <div>
+                        <label for="{{ form.kategori.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                            {{ form.kategori.label }} {% if form.kategori.field.required %}<span class="text-red-500">*</span>{% endif %}
+                        </label>
+                        <div class="[&_select]:w-full [&_select]:bg-[#27272a] [&_select]:border [&_select]:border-zinc-700/80 [&_select]:rounded-xl [&_select]:px-3 [&_select]:py-2 [&_select]:text-xs [&_select]:text-white [&_select]:focus:outline-none [&_select]:focus:border-red-600">
+                            {{ form.kategori }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Masa Jabatan -->
+                {% if form.masa_jabatan %}
+                <div>
+                    <label for="{{ form.masa_jabatan.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                        {{ form.masa_jabatan.label }}
+                    </label>
+                    <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                        {{ form.masa_jabatan }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Unit Pasar Penugasan -->
+                {% if form.pasar or form.unit_pasar %}
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1">Unit Pasar Penugasan</label>
+                    <div class="[&_select]:w-full [&_select]:bg-[#27272a] [&_select]:border [&_select]:border-zinc-700/80 [&_select]:rounded-xl [&_select]:px-3 [&_select]:py-2 [&_select]:text-xs [&_select]:text-white [&_select]:focus:outline-none [&_select]:focus:border-red-600">
+                        {% if form.pasar %}{{ form.pasar }}{% else %}{{ form.unit_pasar }}{% endif %}
+                    </div>
+                    <div class="mt-1.5 pt-1 border-t border-red-900/40">
+                        <p class="text-[11px] text-red-400/90 leading-tight">
+                            <span class="underline font-semibold">Catatan:</span> Khusus/berlaku bagi <span class="underline decoration-red-500">staf yang dikirim/ditugaskan menjadi Kepala Unit Pasar</span>.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Urutan & Status Switch -->
+                <div class="grid grid-cols-2 gap-4 pt-1">
+                    {% if form.urutan %}
+                    <div>
+                        <label for="{{ form.urutan.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">Urutan</label>
+                        <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-1.5 [&_input]:text-xs [&_input]:text-white [&_input]:focus:outline-none [&_input]:focus:border-red-600">
+                            {{ form.urutan }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if form.is_active or form.status_aktif %}
+                    <div class="flex flex-col justify-center">
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Status</label>
+                        <label class="relative inline-flex items-center cursor-pointer mt-1">
+                            {% if form.is_active %}{{ form.is_active }}{% else %}{{ form.status_aktif }}{% endif %}
+                            <span class="ml-2 text-xs text-white font-medium">Aktif</span>
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Loop Fallback untuk Field DB Lain yang Belum Tercover -->
+            {% for field in form %}
+                {% if field.name not in "nama,nip,foto,jabatan,kategori,pasar,unit_pasar,bio,deskripsi,urutan,is_active,status_aktif,masa_jabatan,sambutan,sambutan_singkat,tugas,uraian_tugas" %}
+                <div class="bg-[#18181b] p-4 rounded-xl border border-zinc-800/80">
+                    <label for="{{ field.id_for_label }}" class="block text-xs font-medium text-gray-300 mb-1">
+                        {{ field.label }}
+                    </label>
+                    <div class="[&_input]:w-full [&_input]:bg-[#27272a] [&_input]:border [&_input]:border-zinc-700/80 [&_input]:rounded-xl [&_input]:px-3 [&_input]:py-2 [&_input]:text-xs [&_input]:text-white [&_select]:w-full [&_select]:bg-[#27272a] [&_select]:border [&_select]:border-zinc-700/80 [&_select]:rounded-xl [&_select]:px-3 [&_select]:py-2 [&_select]:text-xs [&_select]:text-white">
+                        {{ field }}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Tombol Aksi Utama -->
+            <div class="flex gap-3 pt-2">
+                <a href="{% url 'dashboard:anggota_list' %}" class="w-1/3 py-3 bg-[#18181b] hover:bg-zinc-800 text-gray-300 font-medium text-xs text-center rounded-xl transition border border-zinc-800 flex items-center justify-center">
+                    BATAL
+                </a>
+                <button type="submit" class="w-2/3 py-3 bg-red-700 hover:bg-red-600 text-white font-semibold text-xs rounded-xl transition shadow-lg shadow-red-900/30 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    {% if mode == 'edit' %}SIMPAN PERUBAHAN{% else %}SIMPAN ANGGOTA{% endif %}
+                </button>
+            </div>
+
+        </div>
+    </form>
 </div>
-<table class="w-full bg-white rounded-lg shadow overflow-hidden">
-    <thead class="bg-gray-900 text-white text-left text-sm">
-        <tr><th class="p-3">Nama</th><th class="p-3">Jabatan</th><th class="p-3">Kategori</th><th class="p-3">Unit Pasar</th><th class="p-3">Aksi</th></tr>
-    </thead>
-    <tbody>
-        {% for a in anggota_list %}
-        <tr class="border-t text-sm">
-            <td class="p-3">{{ a.nama }}</td>
-            <td class="p-3">{{ a.jabatan }}</td>
-            <td class="p-3">{{ a.get_kategori_display }}</td>
-            <td class="p-3">{{ a.pasar.nama|default:"-" }}</td>
-            <td class="p-3 space-x-2">
-                <a href="{% url 'dashboard:anggota_update' a.pk %}" class="text-blue-700 hover:underline">Edit</a>
-                <form method="post" action="{% url 'dashboard:anggota_delete' a.pk %}" class="inline" onsubmit="return confirm('Hapus {{ a.nama }}?')">
-                    {% csrf_token %}
-                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                </form>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada data anggota.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
 {% endblock %}

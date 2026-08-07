@@ -9,10 +9,12 @@ class PasarForm(forms.ModelForm):
         model = Pasar
         exclude = ["slug"]
         widgets = {
-            "alamat": forms.Textarea(attrs={"rows": 3}),
-            "deskripsi": forms.Textarea(attrs={"rows": 4}),
-            "sejarah_fungsi": forms.Textarea(attrs={"rows": 4}),
-            "ekosistem_pedagang": forms.Textarea(attrs={"rows": 4}),
+            "nama": forms.TextInput(attrs={"class": "adm-field"}),
+            "alamat": forms.Textarea(attrs={"class": "adm-field", "rows": 3}),
+            "deskripsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "sejarah_fungsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "ekosistem_pedagang": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "foto_sampul": forms.FileInput(attrs={"class": "adm-file-input"}),
         }
         error_messages = {
             "nama": {"required": "Nama unit pasar tidak boleh kosong."},
@@ -25,7 +27,14 @@ class AnggotaForm(forms.ModelForm):
         model = Anggota
         fields = "__all__"
         widgets = {
-            "uraian_tugas": forms.Textarea(attrs={"rows": 4}),
+            "nama": forms.TextInput(attrs={"class": "adm-field"}),
+            "jabatan": forms.TextInput(attrs={"class": "adm-field"}),
+            "kategori": forms.Select(attrs={"class": "adm-field"}),
+            "pasar": forms.Select(attrs={"class": "adm-field"}),
+            "masa_jabatan": forms.TextInput(attrs={"class": "adm-field"}),
+            "sambutan_singkat": forms.Textarea(attrs={"class": "adm-field", "rows": 3}),
+            "uraian_tugas": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
+            "foto": forms.FileInput(attrs={"class": "adm-file-input"}),
         }
         error_messages = {
             "nama": {"required": "Nama anggota tidak boleh kosong."},
@@ -39,8 +48,11 @@ class GaleriForm(forms.ModelForm):
         model = Galeri
         fields = "__all__"
         widgets = {
-            "keterangan": forms.Textarea(attrs={"rows": 3}),
-            "tanggal": forms.DateInput(attrs={"type": "date"}),
+            "judul": forms.TextInput(attrs={"class": "adm-field"}),
+            "kategori": forms.Select(attrs={"class": "adm-field"}),
+            "keterangan": forms.Textarea(attrs={"class": "adm-field", "rows": 3}),
+            "tanggal": forms.DateInput(attrs={"class": "adm-field", "type": "date"}),
+            "foto": forms.FileInput(attrs={"class": "adm-file-input"}),
         }
         error_messages = {
             "judul": {"required": "Judul foto tidak boleh kosong."},

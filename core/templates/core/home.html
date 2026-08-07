@@ -11,21 +11,46 @@
     .font-sans-clean {
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+
+    /* ---------------------------------------------------- */
+    /* 1. ANIMASI CARD SCROLL REVEAL SMOOTH (SEMUA CARD)     */
+    /* ---------------------------------------------------- */
+    .reveal-card {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+    }
+
+    /* Saat Card Masuk Tampilan Layar */
+    .reveal-card.revealed {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Efek Staggering (Jeda Berurutan untuk Tiap Card) */
+    .reveal-card:nth-child(1) { transition-delay: 0.1s; }
+    .reveal-card:nth-child(2) { transition-delay: 0.22s; }
+    .reveal-card:nth-child(3) { transition-delay: 0.34s; }
+    .reveal-card:nth-child(4) { transition-delay: 0.46s; }
+    .reveal-card:nth-child(5) { transition-delay: 0.58s; }
+    .reveal-card:nth-child(6) { transition-delay: 0.7s; }
 </style>
 
 <div class="bg-[#121212] min-h-screen text-white font-sans-clean tracking-tight">
 
     <!-- ========================================== -->
-    <!-- HERO CAROUSEL SECTION (FIXED HEIGHT 600PX) -->
+    <!-- HERO CAROUSEL SECTION (STANDARD SMOOTH SLIDE) -->
     <!-- ========================================== -->
     <section class="relative w-full h-[500px] md:h-[600px] border-b border-zinc-800 bg-zinc-900 overflow-hidden">
-        <div id="heroCarousel" class="relative w-full h-full">
+        <div id="heroCarousel" class="w-full h-full relative overflow-hidden">
             
-            <!-- Wrapper Slide -->
-            <div class="carousel-inner flex h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]">
+            <!-- Wrapper Slide (Horizontal Track) -->
+            <div id="carouselInner" class="flex w-full h-full transition-transform duration-500 ease-in-out">
 
-                <!-- SLIDE 1: DINAMIS (BANNERS DATABASE) -->
-                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center">
+                <!-- SLIDE 1 -->
+                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center">
                     {% if hero_banner and hero_banner.gambar %}
                         <img src="{{ hero_banner.gambar.url }}" class="absolute inset-0 w-full h-full object-cover object-center" alt="Hero Banner Utama">
                     {% else %}
@@ -33,14 +58,13 @@
                     {% endif %}
                 </div>
 
-                <!-- SLIDE 2: PROFIL UPTD -->
-                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                <!-- SLIDE 2 -->
+                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
                     <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Suasana Gedung dan Area Pasar">
-                    
                     <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
 
                     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
                             <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
                                 Tentang Kami
                             </span>
@@ -56,18 +80,16 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="hidden md:block"></div>
                     </div>
                 </div>
 
-                <!-- SLIDE 3: UNIT PASAR -->
-                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                <!-- SLIDE 3 -->
+                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
                     <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Lapak Pedagang Pasar Tradisional">
-                    
                     <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
 
                     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
                             <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
                                 Pengelolaan Wilayah
                             </span>
@@ -83,18 +105,16 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="hidden md:block"></div>
                     </div>
                 </div>
 
-                <!-- SLIDE 4: KEANGGOTAAN -->
-                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                <!-- SLIDE 4 -->
+                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
                     <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Aktivitas Pedagang Pasar">
-                    
                     <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
 
                     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
                             <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
                                 Sumber Daya Manusia
                             </span>
@@ -110,18 +130,16 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="hidden md:block"></div>
                     </div>
                 </div>
 
-                <!-- SLIDE 5: GALERI -->
-                <div class="carousel-item min-w-full h-[500px] md:h-[600px] relative flex items-center bg-zinc-900 overflow-hidden">
+                <!-- SLIDE 5 -->
+                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
                     <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Dokumentasi Produk Pasar">
-                    
                     <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
 
                     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="space-y-3 sm:space-y-4 max-w-lg">
+                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
                             <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
                                 Dokumentasi
                             </span>
@@ -137,22 +155,21 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="hidden md:block"></div>
                     </div>
                 </div>
 
             </div>
 
             <!-- Navigasi Carousel -->
-            <button id="prevBtn" aria-label="Slide Sebelumnya" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-20">
+            <button id="prevBtn" aria-label="Slide Sebelumnya" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </button>
-            <button id="nextBtn" aria-label="Slide Selanjutnya" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-20">
+            <button id="nextBtn" aria-label="Slide Selanjutnya" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </button>
 
-            <!-- Indicator Bullets (Generated Dinamis via JS) -->
-            <div id="carouselIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20"></div>
+            <!-- Indicators -->
+            <div id="carouselIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30"></div>
 
         </div>
     </section>
@@ -171,9 +188,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-5xl mx-auto">
                 {% for pimpinan in pimpinan_list %}
-                    <div class="bg-[#1a1a1a]/90 border border-zinc-800 rounded-xl p-3.5 sm:p-5 shadow-xl backdrop-blur-md flex items-center gap-3.5 sm:gap-5">
+                    <!-- DITAMBAHKAN CLASS reveal-card -->
+                    <div class="reveal-card bg-[#1a1a1a]/90 border border-zinc-800 rounded-xl p-3.5 sm:p-5 shadow-xl backdrop-blur-md flex items-center gap-3.5 sm:gap-5">
                         <div class="pr-3.5 sm:pr-5 border-r border-zinc-700/60 shrink-0">
-                            <!-- UKURAN FOTO SERAGAM (28x32 / 112px x 128px) -->
                             <div class="w-24 h-28 sm:w-28 sm:h-32 rounded-md overflow-hidden bg-zinc-800 shrink-0">
                                 {% if pimpinan.foto %}
                                     <img src="{{ pimpinan.foto.url }}" alt="{{ pimpinan.nama }}" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-300">
@@ -238,9 +255,10 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 sm:gap-x-10 sm:gap-y-16 pt-4 sm:pt-6">
                 {% for pasar in unit_pasar_list %}
-                    <a href="{% url 'market:market_detail' pasar.slug %}" class="group relative flex flex-col items-start w-full">
+                    <!-- DITAMBAHKAN CLASS reveal-card -->
+                    <a href="{% url 'market:market_detail' pasar.slug %}" class="reveal-card group relative flex flex-col items-start w-full">
                         
-                        <!-- SERAGAM: BOX GAMBAR UNIT PASAR TINGGI FIX 220PX -->
+                        <!-- BOX GAMBAR -->
                         <div class="w-[92%] h-[200px] sm:h-[220px] rounded-none overflow-hidden bg-zinc-900 relative z-10 -mb-10 sm:-mb-12 p-[2px] bg-gradient-to-r from-zinc-600 via-zinc-700 to-zinc-600 group-hover:from-red-600 group-hover:via-rose-500 group-hover:to-orange-500 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.8)] group-hover:shadow-[0_0_25px_rgba(225,29,72,0.5)] transition-all duration-300 group-hover:-translate-y-1.5">
                             <div class="w-full h-full bg-zinc-900 overflow-hidden relative">
                                 {% if pasar.foto %}
@@ -260,7 +278,7 @@
                             </div>
                         </div>
 
-                        <!-- SERAGAM: CARD BODY PASAR TINGGI FIX 220PX -->
+                        <!-- CARD BODY -->
                         <div class="w-[92%] ml-auto p-[2px] bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-800 group-hover:from-red-600 group-hover:via-rose-600 group-hover:to-orange-500 shadow-[0_20px_35px_-15px_rgba(0,0,0,0.9)] group-hover:shadow-[0_0_30px_rgba(225,29,72,0.35)] transition-all duration-300">
                             <div class="w-full h-[220px] bg-[#181818] pt-14 sm:pt-16 pb-5 sm:pb-6 px-5 sm:px-6 flex flex-col justify-between relative">
                                 <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 shadow-[0_0_15px_rgba(225,29,72,0.9)]"></div>
@@ -321,18 +339,19 @@
                 <p class="text-gray-400 text-xs sm:text-sm font-normal">Dokumentasi upaya peningkatan fasilitas dan pelayanan di setiap unit pasar.</p>
             </div>
 
-            <!-- Grid Galeri dengan Ukuran Kartu Seragam (Tinggi 240px) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 mb-8 sm:mb-10">
+            <!-- Grid Galeri -->
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-8 sm:mb-10 px-2 sm:px-0">
                 {% for item in galeri_preview %}
+                <!-- DITAMBAHKAN CLASS reveal-card -->
                 <div onclick="openGalleryModal({{ forloop.counter0 }})" 
-                     class="group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800/80 h-[220px] sm:h-[240px] shadow-xl cursor-pointer">
+                     class="reveal-card group relative rounded-lg sm:rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800/80 h-[120px] xs:h-[150px] sm:h-[200px] md:h-[240px] shadow-lg cursor-pointer">
                     <img src="{{ item.foto.url }}" alt="{{ item.judul }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-3.5 sm:p-4 flex flex-col justify-end group-hover:from-black/95 transition-all">
-                        <span class="text-[9px] sm:text-[10px] text-red-400 font-semibold uppercase tracking-wider mb-0.5">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-1.5 sm:p-3 md:p-4 flex flex-col justify-end group-hover:from-black/95 transition-all">
+                        <span class="text-[7px] xs:text-[8px] sm:text-[10px] text-red-400 font-semibold uppercase tracking-wider mb-0.5 line-clamp-1">
                             {{ item.get_kategori_display }}
                         </span>
-                        <h4 class="text-xs sm:text-sm font-semibold text-white truncate">{{ item.judul }}</h4>
-                        <p class="text-[9px] sm:text-[10px] text-gray-400 font-normal">{{ item.tanggal|date:"d M Y" }}</p>
+                        <h4 class="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-semibold text-white truncate leading-tight">{{ item.judul }}</h4>
+                        <p class="hidden sm:block text-[9px] sm:text-[10px] text-gray-400 font-normal mt-0.5">{{ item.tanggal|date:"d M Y" }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -347,80 +366,77 @@
         </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- LIGHTBOX / POPUP MODAL GALERI             -->
-    <!-- ========================================== -->
-    <div id="galleryModal" onclick="closeModalOnBackdrop(event)" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 transition-opacity duration-300">
-        
-        <!-- Tombol Close -->
-        <button onclick="closeGalleryModal()" aria-label="Tutup Galeri" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white bg-zinc-800/80 hover:bg-red-700 p-2 sm:p-3 rounded-full transition z-30">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+    <!-- LIGHTBOX / POPUP MODAL GALERI -->
+    <div id="galleryModal" onclick="closeModalOnBackdrop(event)" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 transition-opacity duration-300">
+        <button onclick="closeGalleryModal()" aria-label="Tutup Galeri" class="absolute top-3 right-3 sm:top-6 sm:right-6 text-white/80 hover:text-white bg-zinc-800/80 hover:bg-red-700 p-2 sm:p-3 rounded-full transition z-30">
+            <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
 
-        <!-- Tombol Navigasi Kiri (Prev) -->
-        <button onclick="prevGalleryImage()" aria-label="Gambar Sebelumnya" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-red-700 text-white p-2.5 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
+        <button onclick="prevGalleryImage()" aria-label="Gambar Sebelumnya" class="absolute left-1.5 sm:left-6 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-700 text-white p-2 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
+            <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
 
-        <!-- Container Konten Gambar & Text -->
-        <div class="max-w-4xl w-full max-h-[85vh] flex flex-col items-center justify-center relative z-20">
-            <div class="relative w-full max-h-[65vh] sm:max-h-[72vh] flex justify-center items-center overflow-hidden rounded-lg bg-zinc-950">
-                <img id="modalImg" src="" alt="" class="max-w-full max-h-[65vh] sm:max-h-[72vh] object-contain select-none transition-all duration-300">
+        <div class="w-full max-w-[90%] sm:max-w-2xl flex flex-col items-center justify-center relative z-20 px-2 sm:px-0">
+            <div class="w-full max-w-[600px] h-[220px] xs:h-[260px] sm:h-[360px] md:h-[420px] overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 shadow-2xl relative">
+                <img id="modalImg" src="" alt="" class="w-full h-full object-cover object-center transition-all duration-300 select-none">
             </div>
 
-            <!-- Detail Teks Gambar -->
-            <div class="w-full text-center mt-3 sm:mt-4 space-y-1">
-                <span id="modalKategori" class="inline-block text-[10px] sm:text-xs text-rose-400 font-semibold uppercase tracking-wider"></span>
-                <h3 id="modalJudul" class="text-sm sm:text-lg font-bold text-white px-4"></h3>
-                <p id="modalTanggal" class="text-[10px] sm:text-xs text-zinc-400 font-normal"></p>
+            <div class="w-full text-center mt-3 space-y-0.5 sm:space-y-1">
+                <span id="modalKategori" class="inline-block text-[8px] sm:text-xs text-rose-400 font-semibold uppercase tracking-wider"></span>
+                <h3 id="modalJudul" class="text-xs sm:text-base font-bold text-white px-2 truncate"></h3>
+                <p id="modalTanggal" class="text-[8px] sm:text-xs text-zinc-400 font-normal"></p>
             </div>
         </div>
 
-        <!-- Tombol Navigasi Kanan (Next) -->
-        <button onclick="nextGalleryImage()" aria-label="Gambar Selanjutnya" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-red-700 text-white p-2.5 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
+        <button onclick="nextGalleryImage()" aria-label="Gambar Selanjutnya" class="absolute right-1.5 sm:right-6 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-red-700 text-white p-2 sm:p-3.5 rounded-full border border-zinc-700/60 backdrop-blur-sm transition z-30">
+            <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </button>
     </div>
     {% endif %}
 
 </div>
 
-<!-- JavaScript Autoplay, Carousel & Gallery Modal Lightbox -->
+<!-- JAVASCRIPT ANIMASI -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- CAROUSEL MAIN HERO ---
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-item');
-        const totalSlides = slides.length;
-        const inner = document.querySelector('.carousel-inner');
-        const indicatorsContainer = document.getElementById('carouselIndicators');
-        let autoplayTimer = null;
+        // ==========================================
+    // 1. STANDARD HORIZONTAL CAROUSEL SLIDER
+    // ==========================================
+    const carousel = document.getElementById('heroCarousel');
+    const carouselInner = document.getElementById('carouselInner');
+    const slides = carouselInner ? carouselInner.querySelectorAll('.carousel-slide') : [];
+    const totalSlides = slides.length;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const indicatorsContainer = document.getElementById('carouselIndicators');
 
-        // Inisialisasi Indicator Bullets Secara Dinamis
-        if (indicatorsContainer && totalSlides > 0) {
+    let currentIndex = 0;
+    let isTransitioning = false;
+    let autoplayTimer = null;
+    let autoplayDirection = 'next'; // Menyimpan arah autoplay ('next' atau 'prev')
+
+    if (totalSlides > 0 && carouselInner) {
+        // Generate Indicators (Dots)
+        if (indicatorsContainer) {
             indicatorsContainer.innerHTML = '';
-            for (let i = 0; i < totalSlides; i++) {
+            slides.forEach((_, i) => {
                 const btn = document.createElement('button');
-                btn.className = `indicator w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-red-600 w-6' : 'bg-gray-500/60'}`;
+                btn.className = `indicator h-2.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-red-600 w-6' : 'bg-gray-500/60 w-2.5'}`;
                 btn.setAttribute('aria-label', `Go to slide ${i + 1}`);
-                btn.addEventListener('click', () => goToSlideManual(i));
+                btn.addEventListener('click', () => {
+                    autoplayDirection = 'next'; // Reset ke kanan jika dot diklik
+                    goToSlide(i);
+                    startAutoplay();
+                });
                 indicatorsContainer.appendChild(btn);
-            }
+            });
         }
 
-        const indicators = document.querySelectorAll('.indicator');
+        const indicators = indicatorsContainer ? indicatorsContainer.querySelectorAll('.indicator') : [];
 
-        function updateCarousel() {
-            if (!inner) return;
-            inner.style.transform = `translateX(-${currentSlide * 100}%)`;
-            indicators.forEach((ind, index) => {
-                if (index === currentSlide) {
+        function updateIndicators(index) {
+            indicators.forEach((ind, i) => {
+                if (i === index) {
                     ind.classList.remove('bg-gray-500/60', 'w-2.5');
                     ind.classList.add('bg-red-600', 'w-6');
                 } else {
@@ -430,51 +446,122 @@
             });
         }
 
+        function goToSlide(index) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            if (index < 0) {
+                currentIndex = totalSlides - 1;
+            } else if (index >= totalSlides) {
+                currentIndex = 0;
+            } else {
+                currentIndex = index;
+            }
+
+            carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+            updateIndicators(currentIndex);
+
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+
         function nextSlide() {
-            if (totalSlides === 0) return;
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateCarousel();
+            goToSlide(currentIndex + 1);
         }
 
         function prevSlide() {
-            if (totalSlides === 0) return;
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateCarousel();
+            goToSlide(currentIndex - 1);
+        }
+
+        // Jalankan slide sesuai arah pilihan user (kiri/kanan)
+        function autoStep() {
+            if (autoplayDirection === 'prev') {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
         }
 
         function startAutoplay() {
             stopAutoplay();
             if (totalSlides > 1) {
-                autoplayTimer = setInterval(nextSlide, 5000);
+                autoplayTimer = setInterval(autoStep, 5000);
             }
         }
 
         function stopAutoplay() {
-            if (autoplayTimer) {
-                clearInterval(autoplayTimer);
-            }
+            if (autoplayTimer) clearInterval(autoplayTimer);
         }
 
-        function goToSlideManual(index) {
-            currentSlide = index;
-            updateCarousel();
-            startAutoplay();
-        }
-
-        document.getElementById('nextBtn')?.addEventListener('click', () => {
+        // Tombol Kanan -> Atur arah ke KANAN
+        nextBtn?.addEventListener('click', () => {
+            autoplayDirection = 'next';
             nextSlide();
             startAutoplay();
         });
 
-        document.getElementById('prevBtn')?.addEventListener('click', () => {
+        // Tombol Kiri -> Atur arah ke KIRI
+        prevBtn?.addEventListener('click', () => {
+            autoplayDirection = 'prev';
             prevSlide();
             startAutoplay();
         });
 
+        carousel.addEventListener('mouseenter', stopAutoplay);
+        carousel.addEventListener('mouseleave', startAutoplay);
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carousel.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                autoplayDirection = 'next';
+                nextSlide();
+                startAutoplay();
+            } else if (touchEndX - touchStartX > 50) {
+                autoplayDirection = 'prev';
+                prevSlide();
+                startAutoplay();
+            }
+        }, { passive: true });
+
         startAutoplay();
+    }
+        // ==========================================
+        // 2. SCROLL REVEAL OBSERVER UNTUK SEMUA CARD
+        // ==========================================
+        const cardObserverOptions = {
+            root: null,
+            threshold: 0.15, // Card terdeteksi saat 15% bagian card masuk layar
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                } else {
+                    // Berjalan bolak-balik: Saat di-scroll menjauh, card akan bersiap re-animate
+                    entry.target.classList.remove('revealed');
+                }
+            });
+        }, cardObserverOptions);
+
+        // Pasang observer ke seluruh elemen card
+        document.querySelectorAll('.reveal-card').forEach(card => {
+            cardObserver.observe(card);
+        });
     });
 
-    // --- GALLERY POPUP MODAL LIGHTBOX ---
+    // ==========================================
+    // 3. GALLERY LIGHTBOX MODAL
+    // ==========================================
     const galleryItems = [
         {% if galeri_preview %}
             {% for item in galeri_preview %}

@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import models
+from django.db.models.functions import Lower, Trim
+from django.core.paginator import Paginator
+
 from .decorators import staff_required
 from .forms import PasarForm, AnggotaForm, GaleriForm, ProfilUPTDForm, MisiUPTDForm
 
@@ -8,6 +11,7 @@ from complaint.models import Pengaduan
 from market.models import Pasar
 from membership.models import Anggota
 from core.models import Galeri, ProfilUPTD, MisiUPTD
+
 
 # ---------- DASHBOARD HOME ----------
 @staff_required
@@ -55,7 +59,8 @@ def home_dashboard(request):
     }
     return render(request, "dashboard/home_dashboard.html", context)
 
-# ---------- PENGADUAN (sudah ada, tetap) ----------
+
+# ---------- PENGADUAN ----------
 @staff_required
 def pengaduan_list(request):
     pengaduan = Pengaduan.objects.all()
@@ -87,6 +92,7 @@ def pengaduan_delete(request, pk):
         item.delete()
         messages.success(request, "Pengaduan dihapus.")
     return redirect("dashboard:pengaduan_list")
+
 
 # ---------- UNIT PASAR ----------
 @staff_required
@@ -120,6 +126,7 @@ def unit_pasar_delete(request, pk):
         messages.success(request, "Unit pasar dihapus.")
     return redirect("dashboard:unit_pasar_list")
 
+
 # ---------- ANGGOTA ----------
 @staff_required
 def anggota_list(request):
@@ -152,19 +159,55 @@ def anggota_delete(request, pk):
         messages.success(request, "Anggota dihapus.")
     return redirect("dashboard:anggota_list")
 
+
 # ---------- GALERI ----------
 @staff_required
 def gallery_list(request):
-    return render(request, "dashboard/gallery_list.html", {"gallery_list": Galeri.objects.all()})
+    selected_category = request.GET.get('kategori', '').strip()
+    
+    if selected_category:
+        galleries = Galeri.objects.filter(kategori__icontains=selected_category).order_by('-tanggal')
+    else:
+        galleries = Galeri.objects.all().order_by('-tanggal')
+    
+    categories = ['kebersamaan', 'kegiatan']
+
+    paginator = Paginator(galleries, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'gallery_list': page_obj,
+        'page_obj': page_obj,
+        'categories': categories,
+        'selected_category': selected_category,
+    }
+    return render(request, "dashboard/gallery_list.html", context)
 
 @staff_required
 def gallery_create(request):
     form = GaleriForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        galeri = form.save(commit=False)
+        if galeri.kategori:
+            galeri.kategori = galeri.kategori.strip()
+        galeri.save()
         messages.success(request, "Foto berhasil ditambahkan ke galeri.")
         return redirect("dashboard:gallery_list")
     return render(request, "dashboard/gallery_form.html", {"form": form})
+
+@staff_required
+def gallery_edit(request, pk):
+    foto = get_object_or_404(Galeri, pk=pk)
+    form = GaleriForm(request.POST or None, request.FILES or None, instance=foto)
+    if request.method == 'POST' and form.is_valid():
+        galeri = form.save(commit=False)
+        if galeri.kategori:
+            galeri.kategori = galeri.kategori.strip()
+        galeri.save()
+        messages.success(request, 'Data galeri berhasil diperbarui!')
+        return redirect('dashboard:gallery_list')
+    return render(request, 'dashboard/gallery_form.html', {'form': form})
 
 @staff_required
 def gallery_delete(request, pk):
@@ -173,6 +216,7 @@ def gallery_delete(request, pk):
         foto.delete()
         messages.success(request, "Foto dihapus dari galeri.")
     return redirect("dashboard:gallery_list")
+
 
 # ---------- PROFIL UPTD ----------
 @staff_required
