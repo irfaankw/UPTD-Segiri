@@ -75,7 +75,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- SECTION 1: PIMPINAN                       -->
+        <!-- SECTION 1: PIMPINAN                        -->
         <!-- ========================================== -->
         {% if pimpinan_list %}
         <div class="mb-16">
@@ -167,7 +167,7 @@
         </div>
         {% endif %}
 
-         <!-- ========================================== -->
+        <!-- ========================================== -->
         <!-- SECTION 3: PENGELOLA KEPALA UNIT           -->
         <!-- ========================================== -->
         {% if kepala_unit_list %}
@@ -180,8 +180,8 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
                 {% for ku in kepala_unit_list %}
                 <a href="{% url 'membership:detail' ku.pk %}" 
-                class="flex flex-col items-center text-center group scroll-hide scroll-animate-popup"
-                style="--staf-index: {{ forloop.counter0 }};">
+                   class="flex flex-col items-center text-center group scroll-hide scroll-animate-popup"
+                   style="--staf-index: {{ forloop.counter0 }};">
                     
                     <!-- Foto Bulat Kepala Unit -->
                     <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container-low mb-3 shadow-md group-hover:border-primary group-hover:scale-105 transition-all duration-300 flex items-center justify-center">
@@ -209,13 +209,12 @@
             </div>
         </div>
         {% endif %}
-       
 
     </div>
 </div>
 
 <script>
-    /* JAVASCRIPT ANIMASI SCROLL HALUS & BERULANG */
+    /* JAVASCRIPT ANIMASI SCROLL (HANYA DIEKSEKUSI 1 KALI PER ELEMEN) */
     document.addEventListener("DOMContentLoaded", function () {
         const observerOptions = {
             root: null,
@@ -223,16 +222,19 @@
             threshold: 0.1
         };
 
-        const scrollObserver = new IntersectionObserver((entries) => {
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
+                    // Delay berdasarkan urutan elemen
                     if (entry.target.style.getPropertyValue('--staf-index')) {
                         const index = entry.target.style.getPropertyValue('--staf-index');
                         entry.target.style.animationDelay = `${index * 0.12}s`;
                     }
 
+                    // Tampilkan elemen dari mode hidden
                     entry.target.classList.remove('scroll-hide');
 
+                    // Jalankan class animasi yang sesuai
                     if (entry.target.classList.contains('scroll-animate-left')) {
                         entry.target.classList.add('animate-pimpinan-left');
                     } else if (entry.target.classList.contains('scroll-animate-right')) {
@@ -240,10 +242,9 @@
                     } else if (entry.target.classList.contains('scroll-animate-popup')) {
                         entry.target.classList.add('animate-pop-up');
                     }
-                } else {
-                    entry.target.classList.add('scroll-hide');
-                    entry.target.style.animationDelay = '0s';
-                    entry.target.classList.remove('animate-pimpinan-left', 'animate-pimpinan-right', 'animate-pop-up');
+
+                    // Hentikan pemantauan elemen agar animasi TIDAK diulang
+                    observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);

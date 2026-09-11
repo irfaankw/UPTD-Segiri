@@ -1,6 +1,9 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 load_dotenv()
 
@@ -16,8 +19,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# ALLOWED_HOSTS = ['*']
-
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
@@ -32,7 +33,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "cloudinary_storage",  # Storage backend Cloudinary (harus sebelum staticfiles)
     "django.contrib.staticfiles",
+    "cloudinary",          # Cloudinary core library
     "complaint",
     "core",
     "dashboard",
@@ -143,32 +146,27 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Supabase Storage (S3-compatible)
-AWS_ACCESS_KEY_ID        = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY    = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME  = os.getenv("AWS_STORAGE_BUCKET_NAME", "media")
-AWS_S3_ENDPOINT_URL      = os.getenv("AWS_S3_ENDPOINT_URL")
-AWS_S3_REGION_NAME       = os.getenv("AWS_S3_REGION_NAME", "ap-southeast-1")
-SUPABASE_PROJECT_REF     = os.getenv("SUPABASE_PROJECT_REF")    
+# Cloudinary Storage Configuration (Membaca data dari .env)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
 
-AWS_S3_FILE_OVERWRITE    = False
-AWS_S3_SIGNATURE_VERSION = "s3v4"
-AWS_DEFAULT_ACL          = None       # ← WAJIB: hapus ACL header (Supabase tidak support)
-AWS_QUERYSTRING_AUTH     = False      # ← WAJIB: matikan presigned URL
-
-AWS_S3_CUSTOM_DOMAIN = (
-    f"{SUPABASE_PROJECT_REF}.supabase.co"
-    f"/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+# Inisialisasi SDK Cloudinary secara eksplisit
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    secure=True
 )
 
-# Semua file media dikelola django-storages
+# Pengaturan Storage Django
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
