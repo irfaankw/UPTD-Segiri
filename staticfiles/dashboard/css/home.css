@@ -1,0 +1,77 @@
+/* ===== CARD DASAR ===== */
+.adm-card{ background:var(--adm-surface); border:1px solid var(--adm-border); border-radius:14px; }
+
+/* ===== BANNER ===== */
+.adm-banner{
+    background:linear-gradient(120deg, var(--adm-red) 0%, #350707 100%); border:none;
+    padding:26px 28px; display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; margin-bottom:20px;
+}
+.adm-banner-eyebrow{ font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:#f3a5a5; margin:0 0 4px; }
+.adm-banner-name{ font-size:1.7rem; font-weight:800; margin:0; }
+.adm-banner-role{ font-size:.85rem; color:#e9b8b8; margin:4px 0 0; }
+.adm-banner-badge{
+    background:var(--adm-gold); color:#1a1200; font-weight:700; font-size:.82rem;
+    padding:9px 18px; border-radius:999px; text-decoration:none; white-space:nowrap;
+}
+
+/* ===== STAT CARDS ===== */
+.adm-stats-grid{ margin-bottom:20px; }
+.adm-stat{ padding:18px 20px; }
+.adm-stat .lbl{ font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; color:var(--adm-text-dim); display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.adm-stat .val{ font-size:2rem; font-weight:800; line-height:1; white-space:nowrap; }
+.adm-stat .val .unit{ font-size:.8rem; font-weight:500; color:var(--adm-text-dim); margin-left:4px; white-space:normal; }
+.adm-badge-urgent{ background:var(--adm-red-bright); color:#fff; font-size:.62rem; font-weight:700; padding:2px 7px; border-radius:5px; letter-spacing:.03em; flex-shrink:0; }
+.adm-stat.urgent{ border-color:rgba(200,30,30,.5); background:linear-gradient(160deg, rgba(127,20,20,.25), var(--adm-surface) 60%); }
+
+/* ===== PANEL HEAD ===== */
+.adm-panel-head{ padding:20px 22px 4px; }
+.adm-panel-head h2{ font-size:1.05rem; font-weight:700; margin:0; }
+.adm-panel-head p{ font-size:.78rem; color:var(--adm-text-dim); margin:2px 0 0; }
+.adm-panel-head-row{ display:flex; align-items:center; justify-content:space-between; }
+.adm-panel-link{ font-size:.78rem; color:#f3a5a5; text-decoration:none; }
+.adm-panel-link:hover{ text-decoration:underline; }
+.adm-panel-body{ padding:10px 20px 20px; }
+.adm-empty-note{ padding:20px 14px; font-size:.85rem; color:var(--adm-text-dim); margin:0; }
+
+/* ===== CHART BOX (canvas Chart.js) ===== */
+.adm-chart-box{ position:relative; width:100%; height:290px; }
+.adm-chart-box.is-donut{ height:220px; max-width:220px; margin:0 auto; }
+
+/* ===== PENGADUAN TERBARU ===== */
+.adm-complaint-list{ padding:10px 8px 12px; }
+.adm-complaint-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 14px; }
+.adm-complaint-row.has-border{ border-bottom:1px solid var(--adm-border); }
+.adm-complaint-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+.adm-complaint-avatar{ width:32px; height:32px; font-size:.72rem; flex-shrink:0; }
+.adm-complaint-text{ min-width:0; }
+.adm-complaint-name{ font-size:.85rem; font-weight:600; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.adm-complaint-meta{ font-size:.72rem; color:var(--adm-text-dim); margin:0; }
+
+.adm-status-pill{ font-size:.68rem; font-weight:600; padding:4px 10px; border-radius:999px; flex-shrink:0; }
+.st-baru{ background:rgba(234,179,8,.15); color:#eab308; }
+.st-diproses{ background:rgba(59,130,246,.15); color:#60a5fa; }
+.st-selesai{ background:rgba(34,197,94,.15); color:#4ade80; }
+
+/* ===== DONUT LEGEND ===== */
+.adm-donut-legend{ padding:0 22px 20px; display:flex; flex-direction:column; gap:8px; font-size:.8rem; }
+.adm-legend-row{ display:flex; align-items:center; justify-content:space-between; }
+.adm-legend-label{ display:flex; align-items:center; gap:8px; }
+.adm-legend-dot{ width:9px; height:9px; border-radius:999px; display:inline-block; }
+.adm-legend-count{ color:var(--adm-text-dim); }
+
+/* ===== PENGADUAN PER KATEGORI ===== */
+.adm-kategori-body{ padding:14px 22px 20px; }
+.adm-cat-row{ display:flex; align-items:center; justify-content:space-between; font-size:.8rem; margin-bottom:4px; }
+.adm-cat-count{ color:var(--adm-text-dim); }
+.adm-cat-bar{ height:5px; border-radius:999px; background:var(--adm-surface-2); overflow:hidden; margin-bottom:14px; }
+.adm-cat-bar span{ display:block; height:100%; background:var(--adm-red-bright); border-radius:999px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:480px){
+    .adm-stat{ padding:14px; }
+    .adm-stat .val{ font-size:1.5rem; }
+    .adm-stat .lbl{ font-size:.62rem; }
+    .adm-badge-urgent{ font-size:.56rem; padding:2px 6px; }
+    .adm-chart-box{ height:240px; }
+}
