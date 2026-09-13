@@ -19,6 +19,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="15" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>
         <span class="adm-label">Galeri</span>
     </a>
+    <a href="{% url 'dashboard:hero_banner_utama' %}" class="{% if 'hero_banner_utama' in request.resolver_match.url_name %}is-active{% endif %}" title="Banner Utama">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-4 4-2-2-5 5"/></svg>
+        <span class="adm-label">Banner Utama</span>
+    </a>
     <a href="{% url 'dashboard:pengaduan_list' %}" class="{% if 'pengaduan' in request.resolver_match.url_name %}is-active{% endif %}" title="Pengaduan">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         <span class="adm-label">Pengaduan</span>

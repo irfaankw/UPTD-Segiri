@@ -1,17 +1,13 @@
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator
 from django.utils.text import slugify
 
 
-def validate_video_size(file):
-    """Batasi ukuran video maks 45MB (buffer aman dari limit bucket Supabase 50MB)."""
-    max_mb = 45
-    if file.size > max_mb * 1024 * 1024:
-        raise ValidationError(
-            f"Ukuran video maksimal {max_mb}MB (sekarang {file.size / 1024 / 1024:.1f}MB). "
-            "Kompres dulu pakai HandBrake atau ffmpeg sebelum upload."
-        )
+def validate_video_size(value):
+    """
+    Dummy validator function untuk mencegah AttributeError pada file migrasi 0004.
+    Fungsi ini dibiarkan kosong karena validasi video manual sudah tidak digunakan.
+    """
+    pass
 
 
 class Pasar(models.Model):
@@ -29,31 +25,25 @@ class Pasar(models.Model):
     jumlah_pedagang = models.PositiveIntegerField(
         default=0,
         help_text="Update manual sesuai data rekap terbaru (bulanan/tahunan). "
-                   "Merepresentasikan pedagang TERDAFTAR, bukan status kehadiran aktif harian.",
+                  "Merepresentasikan pedagang TERDAFTAR, bukan status kehadiran aktif harian.",
     )
     kelas = models.CharField(max_length=1, choices=KELAS_CHOICES, blank=True)
     jam_operasional = models.CharField(max_length=100, blank=True, default="06.00 - 18.00 WITA")
     deskripsi = models.TextField(blank=True, help_text="Opsional, paragraf penjelasan singkat tentang pasar ini.")
     urutan = models.PositiveSmallIntegerField(default=0, help_text="Urutan tampil di halaman daftar (kecil di depan).")
 
-    # --- Bagian baru untuk market_detail.html ---
-
-    video_profil = models.FileField(
-        upload_to="market/video/",
-        blank=True, null=True,
-        validators=[
-            FileExtensionValidator(allowed_extensions=["mp4", "webm"]),
-            validate_video_size,
-        ],
-        help_text="Upload video profil pasar ini (format MP4/WebM, maks 45MB). "
-                   "Kompres dulu ke H.264 720p pakai HandBrake/ffmpeg sebelum upload. "
-                   "Kosongkan jika belum ada video.",
+    # --- Bagian Video Profil (Diperbaiki menjadi CharField) ---
+    video_profil = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="ID atau URL Video YouTube (Contoh: https://youtu.be/znNhAQzOCz0 atau znNhAQzOCz0). Kosongkan jika belum ada video.",
     )
     video_thumbnail = models.ImageField(
         upload_to="market/video_thumbnail/",
         blank=True, null=True,
         help_text="Foto poster/thumbnail video (ditampilkan sebelum user klik play). "
-                   "Jika kosong, akan pakai foto utama pasar sebagai fallback.",
+                  "Jika kosong, akan pakai foto utama pasar sebagai fallback.",
     )
 
     sejarah_fungsi = models.TextField(
@@ -131,6 +121,7 @@ class KomoditasUnggulan(models.Model):
 
     def __str__(self):
         return f"{self.pasar.nama} - {self.nama}"
+
 
 class DokumenResmi(models.Model):
     pasar = models.ForeignKey(Pasar, on_delete=models.CASCADE, related_name="dokumen_resmi")

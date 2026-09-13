@@ -13,6 +13,9 @@ urlpatterns = [
     path('', views.home_dashboard, name='home_dashboard'),
     path('cari/', views.pencarian, name='pencarian'),
 
+    # Hero Banner Utama
+    path('banner-utama/', views.hero_banner_utama, name='hero_banner_utama'),
+
     # Pengaduan
     path('pengaduan/', views.pengaduan_list, name='pengaduan_list'),
     path('pengaduan/<int:pk>/status/', views.pengaduan_update_status, name='pengaduan_update_status'),
