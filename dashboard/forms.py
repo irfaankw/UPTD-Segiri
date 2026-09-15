@@ -1,7 +1,9 @@
+import re
 from django import forms
 from market.models import Pasar
 from membership.models import Anggota
-from core.models import Galeri, ProfilUPTD, MisiUPTD
+# 1. Tambahkan HeroBannerUtama pada import dari core.models
+from core.models import Galeri, ProfilUPTD, MisiUPTD, HeroBannerUtama
 
 
 class PasarForm(forms.ModelForm):
@@ -17,7 +19,13 @@ class PasarForm(forms.ModelForm):
             "jam_operasional": forms.TextInput(attrs={"class": "adm-field"}),
             "deskripsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
             "urutan": forms.NumberInput(attrs={"class": "adm-field"}),
-            "video_profil": forms.FileInput(attrs={"class": "adm-file-input", "accept": "video/mp4,video/webm"}),
+            
+            # KUNCI UTAMA: Wajib TextInput!
+            "video_profil": forms.TextInput(attrs={
+                "class": "adm-field", 
+                "placeholder": "Contoh: https://www.youtube.com/watch?v=znNhAQzOCz0"
+            }),
+            
             "video_thumbnail": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
             "sejarah_fungsi": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
             "ekosistem_pedagang": forms.Textarea(attrs={"class": "adm-field", "rows": 4}),
@@ -29,6 +37,27 @@ class PasarForm(forms.ModelForm):
             "nama": {"required": "Nama unit pasar tidak boleh kosong."},
             "alamat": {"required": "Alamat pasar tidak boleh kosong."},
         }
+
+    def clean_video_profil(self):
+        val = self.cleaned_data.get("video_profil")
+        if not val:
+            return ""
+        
+        val = str(val).strip()
+
+        # Ekstraksi ID 11 karakter YouTube
+        patterns = [
+            r'(?:v=|\/embed\/|\/shorts\/|\/v\/)([^"&?/\s]{11})',
+            r'youtu\.be\/([^"&?/\s]{11})',
+            r'^([^"&?/\s]{11})$'
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, val)
+            if match:
+                return match.group(1)
+
+        return val
 
 
 class AnggotaForm(forms.ModelForm):
@@ -112,6 +141,7 @@ class ProfilUPTDForm(forms.ModelForm):
             "jam_minggu": {"required": "Jam operasional Minggu tidak boleh kosong."},
         }
 
+
 class MisiUPTDForm(forms.ModelForm):
     class Meta:
         model = MisiUPTD
@@ -121,4 +151,17 @@ class MisiUPTDForm(forms.ModelForm):
         }
         error_messages = {
             "isi": {"required": "Isi misi tidak boleh kosong."},
+        }
+
+
+# 2. TAMBAHAN: Form khusus untuk upload Hero Banner Utama
+class HeroBannerUtamaForm(forms.ModelForm):
+    class Meta:
+        model = HeroBannerUtama
+        fields = ["gambar"]
+        widgets = {
+            "gambar": forms.FileInput(attrs={"class": "adm-file-input", "accept": "image/*"}),
+        }
+        error_messages = {
+            "gambar": {"required": "Silakan pilih file gambar banner utama."},
         }

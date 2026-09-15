@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ProfilUPTD(models.Model):
     # Sambutan Pimpinan
     sambutan_judul = models.CharField(
@@ -68,7 +69,7 @@ class MisiUPTD(models.Model):
         return f"{self.urutan}. {self.isi[:50]}"
 
 
-# --- MODEL BARU: GALERI ---
+# --- MODEL GALERI ---
 class Galeri(models.Model):
     KATEGORI_CHOICES = [
         ('kebersamaan', 'Kebersamaan'),
@@ -90,6 +91,7 @@ class Galeri(models.Model):
         return f"{self.judul} - {self.get_kategori_display()}"
 
 
+# --- SINGLETON BANNER UTAMA ---
 class HeroBannerUtama(models.Model):
     gambar = models.ImageField(
         upload_to='hero_banners/',

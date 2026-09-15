@@ -32,25 +32,27 @@
 
             <!-- CARD VIDEO / HERO -->
             <div class="reveal rounded-xl overflow-hidden border border-outline-variant bg-surface-container">
-                <div id="video-wrapper" class="relative aspect-video bg-surface-container-high">
+                <div id="video-wrapper" class="relative aspect-video bg-surface-container-high overflow-hidden">
                     {% if pasar.video_profil %}
-                    <button type="button" id="video-play-btn"
-                            class="group block absolute inset-0 w-full h-full cursor-pointer"
+                    
+                    <!-- Tombol Play & Overlay Thumbnail -->
+                    <button type="button" id="video-play-btn" onclick="playYoutubeVideo('{{ pasar.video_profil }}')"
+                            class="group block absolute inset-0 w-full h-full cursor-pointer z-10"
                             aria-label="Putar video profil {{ pasar.nama }}">
+                        
                         {% if pasar.video_thumbnail %}
-                        <img src="{{ pasar.video_thumbnail.url }}" alt="Thumbnail video {{ pasar.nama }}"
-                            class="w-full h-full object-cover">
+                        <img src="{{ pasar.video_thumbnail.url }}" alt="Thumbnail video {{ pasar.nama }}" class="w-full h-full object-cover">
                         {% elif pasar.foto %}
-                        <img src="{{ pasar.foto.url }}" alt="Thumbnail video {{ pasar.nama }}"
-                            class="w-full h-full object-cover">
+                        <img src="{{ pasar.foto.url }}" alt="Thumbnail video {{ pasar.nama }}" class="w-full h-full object-cover">
                         {% else %}
-                        <div class="w-full h-full bg-surface-container-high"></div>
+                        <!-- Otomatis ambil Thumbnail dari YouTube jika foto lokal kosong -->
+                        <img src="https://img.youtube.com/vi/{{ pasar.video_profil }}/hqdefault.jpg" alt="Thumbnail video {{ pasar.nama }}" class="w-full h-full object-cover">
                         {% endif %}
 
-                        <!-- Gradient scrim biar teks kebaca di atas foto apapun -->
+                        <!-- Gradient scrim -->
                         <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/40 group-hover:from-black/85 transition"></span>
 
-                        <!-- Badge + judul, overlay di pojok kiri bawah -->
+                        <!-- Badge + judul -->
                         <span class="absolute left-5 bottom-5 right-5 text-left">
                             {% if pasar.kelas %}
                             <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1 mb-2">
@@ -60,7 +62,7 @@
                             <span class="block text-2xl md:text-3xl font-bold text-white drop-shadow-md">{{ pasar.nama }}</span>
                         </span>
 
-                        <!-- Tombol play, tetap di tengah -->
+                        <!-- Tombol play -->
                         <span class="absolute inset-0 flex items-center justify-center">
                             <span class="w-16 h-16 rounded-full bg-primary-container/90 flex items-center justify-center group-hover:scale-110 transition shadow-lg">
                                 <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
@@ -69,6 +71,10 @@
                             </span>
                         </span>
                     </button>
+
+                    <!-- Container untuk Iframe Video YouTube (Solusi Error 153) -->
+                    <div id="youtube-player" class="hidden absolute inset-0 w-full h-full z-20"></div>
+
                     {% elif pasar.foto %}
                     <div class="relative w-full h-full">
                         <img src="{{ pasar.foto.url }}" alt="{{ pasar.nama }}" class="w-full h-full object-cover">
@@ -90,17 +96,6 @@
                     </div>
                     {% endif %}
                 </div>
-
-                {% if not pasar.video_profil and not pasar.foto %}
-                <div class="p-6">
-                    {% if pasar.kelas %}
-                    <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1 mb-3">
-                        Pasar {{ pasar.get_kelas_display }}
-                    </span>
-                    {% endif %}
-                    <h1 class="text-2xl md:text-3xl font-bold text-on-surface">{{ pasar.nama }}</h1>
-                </div>
-                {% endif %}
             </div>
 
             <!-- ARTIKEL: INFORMASI UNIT PASAR -->
@@ -397,8 +392,7 @@
 <div id="modal-galeri" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeModal('modal-galeri')"></div>
 
-    <!-- Tombol navigasi DI LUAR kotak modal, mengambang di atas backdrop -->
-        <button type="button" onclick="galeriPrev()"
+    <button type="button" onclick="galeriPrev()"
             class="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white transition">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -413,11 +407,9 @@
 
     <div class="relative bg-surface-container-lowest border border-outline-variant rounded-xl w-full max-w-4xl h-[85vh] md:h-[560px] overflow-hidden flex flex-col md:flex-row">
 
-        <!-- Sisi gambar: ukuran FIXED, foto apapun dibingkai sama -->
         <div class="relative w-full md:w-3/5 h-1/2 md:h-full bg-black flex items-center justify-center shrink-0">
             <img id="galeri-modal-image" src="{{ pasar.foto_aktivitas.all.0.gambar.url }}"
                  alt="Aktivitas {{ pasar.nama }}" class="w-full h-full object-contain">
-            <!-- Tombol navigasi versi mobile, tetap di dalam gambar karena ruang layar sempit -->
             <button type="button" onclick="galeriPrev()"
                     class="md:hidden absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,7 +424,6 @@
             </button>
         </div>
 
-        <!-- Sisi info -->
         <div class="w-full md:w-2/5 h-1/2 md:h-full flex flex-col p-6 custom-scroll overflow-y-auto">
             <div class="flex items-center justify-between mb-5">
                 <span class="inline-block text-xs font-semibold text-white bg-primary-container rounded-full px-3 py-1">
@@ -505,7 +496,7 @@
 {% if pasar.struktur_organisasi_image %}
 <div id="modal-struktur" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-struktur')"></div>
-    <div class="relative bg-surface-container-lowest border border-outline-variant rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+    <div class="relative bg-surface-container-lowest border border-outline-variant rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
             <h3 class="font-bold text-on-surface">Struktur Keanggotaan — {{ pasar.nama }}</h3>
             <button type="button" onclick="closeModal('modal-struktur')" class="text-outline hover:text-on-surface transition">
@@ -514,101 +505,44 @@
                 </svg>
             </button>
         </div>
-        <div class="custom-scroll overflow-y-auto p-4">
-            <img src="{{ pasar.struktur_organisasi_image.url }}" alt="Struktur organisasi {{ pasar.nama }}" class="w-full rounded-lg">
+        <div class="p-4 custom-scroll overflow-y-auto flex items-center justify-center bg-black/10">
+            <img src="{{ pasar.struktur_organisasi_image.url }}" alt="Struktur {{ pasar.nama }}" class="max-w-full h-auto rounded-lg shadow-md">
         </div>
     </div>
 </div>
 {% endif %}
 
-{% endblock content %}
-
-{% block extra_scripts %}
+<!-- SCRIPT PENGENDALI MODAL & PEMUTAR YOUTUBE -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    // --- Lazy-load video offline: klik thumbnail baru inject <video> ---
-    {% if pasar.video_profil %}
-    const playBtn = document.getElementById('video-play-btn');
-    if (playBtn) {
-        playBtn.addEventListener('click', () => {
-            const wrapper = document.getElementById('video-wrapper');
-            const videoUrl = "{{ pasar.video_profil.url|escapejs }}";
-            wrapper.innerHTML = `<video class="w-full h-full object-cover" src="${videoUrl}"
-                controls autoplay playsinline>
-                Browser kamu tidak mendukung pemutaran video.
-            </video>`;
-        });
+    function openModal(id) {
+        document.getElementById(id)?.classList.remove('hidden');
     }
-    {% endif %}
-
-    // --- Carousel galeri "Aktivitas Pasar" (sidebar + modal, index sinkron) ---
-    const galeriData = [
-        {% for foto in pasar.foto_aktivitas.all %}
-        { url: "{{ foto.gambar.url|escapejs }}", caption: "{{ foto.keterangan|escapejs }}" }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-    let galeriIndex = 0;
-
-    // Preload semua gambar galeri di background begitu halaman dibuka,
-    // biar pas prev/next diklik, gambar udah ada di cache browser (nggak lag)
-    galeriData.forEach(item => {
-        const preloadImg = new Image();
-        preloadImg.src = item.url;
-    });
-
-    const galeriImg = document.getElementById('galeri-image');
-    const galeriCaption = document.getElementById('galeri-caption');
-    const galeriCounter = document.getElementById('galeri-counter');
-    const galeriModalImg = document.getElementById('galeri-modal-image');
-    const galeriModalCaption = document.getElementById('galeri-modal-caption');
-    const galeriModalCounter = document.getElementById('galeri-modal-counter');
-
-    function renderGaleri() {
-        if (galeriData.length === 0) return;
-        const item = galeriData[galeriIndex];
-        const counterText = `${galeriIndex + 1} / ${galeriData.length}`;
-
-        if (galeriImg) galeriImg.src = item.url;
-        if (galeriCaption) galeriCaption.textContent = item.caption;
-        if (galeriCounter) galeriCounter.textContent = counterText;
-
-        if (galeriModalImg) galeriModalImg.src = item.url;
-        if (galeriModalCaption) galeriModalCaption.textContent = item.caption;
-        if (galeriModalCounter) galeriModalCounter.textContent = counterText;
+    function closeModal(id) {
+        document.getElementById(id)?.classList.add('hidden');
     }
 
-    window.galeriPrev = function () {
-        if (galeriData.length === 0) return;
-        galeriIndex = (galeriIndex - 1 + galeriData.length) % galeriData.length;
-        renderGaleri();
-    };
-    window.galeriNext = function () {
-        if (galeriData.length === 0) return;
-        galeriIndex = (galeriIndex + 1) % galeriData.length;
-        renderGaleri();
-    };
+    // Fungsi Putar Video YouTube (Menghindari Error 153)
+ function playYoutubeVideo(videoId) {
+    const btn = document.getElementById('video-play-btn');
+    const playerDiv = document.getElementById('youtube-player');
+    
+    if (!playerDiv) return;
 
-    // --- Modal generik (galeri, dokumen resmi, struktur organisasi) ---
-    window.openModal = function (id) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    };
-    window.closeModal = function (id) {
-        const modal = document.getElementById(id);
-        if (!modal) return;
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    };
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('[id^="modal-"]:not(.hidden)').forEach(m => closeModal(m.id));
-        }
-        if (e.key === 'ArrowLeft') window.galeriPrev();
-        if (e.key === 'ArrowRight') window.galeriNext();
-    });
-});
+    btn.classList.add('hidden');
+    playerDiv.classList.remove('hidden');
+
+    const origin = window.location.origin;
+
+    playerDiv.innerHTML = `
+        <iframe 
+            class="w-full h-full border-0" 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=${encodeURIComponent(origin)}" 
+            title="YouTube Video" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen>
+        </iframe>
+    `;
+}
 </script>
-{% endblock extra_scripts %}
+{% endblock %}

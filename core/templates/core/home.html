@@ -40,139 +40,143 @@
 
 <div class="bg-[#121212] min-h-screen text-white font-sans-clean tracking-tight">
 
-    <!-- ========================================== -->
-    <!-- HERO CAROUSEL SECTION (STANDARD SMOOTH SLIDE) -->
-    <!-- ========================================== -->
-    <section class="relative w-full h-[500px] md:h-[600px] border-b border-zinc-800 bg-zinc-900 overflow-hidden">
-        <div id="heroCarousel" class="w-full h-full relative overflow-hidden">
-            
-            <!-- Wrapper Slide (Horizontal Track) -->
-            <div id="carouselInner" class="flex w-full h-full transition-transform duration-500 ease-in-out">
+<!-- ========================================== -->
+<!-- HERO CAROUSEL SECTION (OPTIMIZED HEIGHT) -->
+<!-- ========================================== -->
+<!-- Mengubah tinggi mobile dari 450px ke 580px (tampilan laptop tetap 650px) -->
+<section class="relative w-full h-[580px] sm:h-[550px] lg:h-[650px] border-b border-zinc-800 bg-zinc-900 overflow-hidden">
+    <div id="heroCarousel" class="w-full h-full relative overflow-hidden">
+        
+        <!-- Wrapper Slide (Horizontal Track) -->
+        <div id="carouselInner" class="flex w-full h-full transition-transform duration-500 ease-in-out">
 
-                <!-- SLIDE 1 -->
-                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center">
-                    {% if hero_banner and hero_banner.gambar %}
-                        <img src="{{ hero_banner.gambar.url }}" class="absolute inset-0 w-full h-full object-cover object-center" alt="Hero Banner Utama">
-                    {% else %}
-                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-red-950 via-zinc-900 to-black"></div>
-                    {% endif %}
-                </div>
-
-                <!-- SLIDE 2 -->
-                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Suasana Gedung dan Area Pasar">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
-
-                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
-                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
-                                Tentang Kami
-                            </span>
-                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                                Profil UPTD Pasar Segiri
-                            </h2>
-                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
-                                Pelajari visi, misi, bagan struktur organisasi, serta jam operasional layanan publik di lingkungan UPTD Pasar Segiri.
-                            </p>
-                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
-                                <a href="{% url 'core:uptd_profile' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
-                                    Lihat Profil UPTD
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 3 -->
-                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Lapak Pedagang Pasar Tradisional">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
-
-                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
-                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
-                                Pengelolaan Wilayah
-                            </span>
-                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                                Unit-Unit Pasar Tradisional
-                            </h2>
-                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
-                                Informasi lengkap unit pasar di bawah naungan UPTD, mulai dari persebaran lokasi, kapasitas lapak, hingga fasilitas pendukung.
-                            </p>
-                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
-                                <a href="{% url 'market:market_unit' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
-                                    Lihat Unit Pasar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 4 -->
-                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Aktivitas Pedagang Pasar">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
-
-                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
-                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
-                                Sumber Daya Manusia
-                            </span>
-                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                                Staf & Keanggotaan
-                            </h2>
-                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
-                                Mengenal jajaran pimpinan, koordinator lapangan, serta staf operasional yang berdedikasi melayani aktivitas pasar harian.
-                            </p>
-                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
-                                <a href="{% url 'membership:membership' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
-                                    Lihat Keanggotaan
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SLIDE 5 -->
-                <div class="carousel-slide w-full h-full flex-shrink-0 relative flex items-center bg-zinc-900 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center" alt="Dokumentasi Produk Pasar">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent w-full md:w-1/2"></div>
-
-                    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full grid grid-cols-1 md:grid-cols-2 items-center h-full">
-                        <div class="slide-content space-y-3 sm:space-y-4 max-w-lg">
-                            <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-[10px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
-                                Dokumentasi
-                            </span>
-                            <h2 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-                                Galeri Kegiatan & Kebersamaan
-                            </h2>
-                            <p class="text-gray-100 text-xs sm:text-sm md:text-base leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] font-normal">
-                                Kumpulan foto dokumentasi berbagai agenda resmi, kegiatan penataan pasar, dan momen kebersamaan di lingkungan UPTD.
-                            </p>
-                            <div class="pt-2 sm:pt-4 flex flex-wrap gap-4">
-                                <a href="{% url 'core:gallery' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-red-900/50 border border-red-600/40">
-                                    Buka Galeri Foto
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- SLIDE 1 (FOTO TANPA TEKS) -->
+            <div class="carousel-slide w-full h-full flex-shrink-0 relative bg-zinc-900 overflow-hidden">
+                {% if hero_banner and hero_banner.gambar %}
+                    <!-- Gambar Banner Utama (Full Display) -->
+                    <img src="{{ hero_banner.gambar.url }}" class="absolute inset-0 w-full h-full object-cover object-center block" alt="Hero Banner Utama">
+                    <!-- Overlay Tipis (Opsional: agar tetap menyatu dengan tema dark) -->
+                    <div class="absolute inset-0 bg-black/20 w-full h-full pointer-events-none"></div>
+                {% else %}
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-red-950 via-zinc-900 to-black"></div>
+                {% endif %}
             </div>
 
-            <!-- Navigasi Carousel -->
-            <button id="prevBtn" aria-label="Slide Sebelumnya" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <button id="nextBtn" aria-label="Slide Selanjutnya" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2 sm:p-3 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </button>
+            <!-- SLIDE 2 -->
+            <div class="carousel-slide w-full h-full flex-shrink-0 relative bg-zinc-900 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center z-0 block" alt="Suasana Gedung dan Area Pasar">
+                <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/95 via-black/80 to-black/40 w-full h-full z-10 pointer-events-none"></div>
 
-            <!-- Indicators -->
-            <div id="carouselIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30"></div>
+                <div class="relative z-20 max-w-7xl mx-auto px-6 py-12 w-full h-full flex flex-col justify-center">
+                    <div class="slide-content space-y-4 max-w-lg">
+                        <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                            Tentang Kami
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-md">
+                            Profil UPTD Pasar Segiri
+                        </h2>
+                        <p class="text-gray-100 text-sm md:text-base leading-relaxed drop-shadow">
+                            Pelajari visi, misi, bagan struktur organisasi, serta jam operasional layanan publik di lingkungan UPTD Pasar Segiri.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-4">
+                            <a href="{% url 'core:uptd_profile' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-3 rounded-xl text-sm transition shadow-lg border border-red-600/40">
+                                Lihat Profil UPTD
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3 -->
+            <div class="carousel-slide w-full h-full flex-shrink-0 relative bg-zinc-900 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center z-0 block" alt="Lapak Pedagang Pasar Tradisional">
+                <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/95 via-black/80 to-black/40 w-full h-full z-10 pointer-events-none"></div>
+
+                <div class="relative z-20 max-w-7xl mx-auto px-6 py-12 w-full h-full flex flex-col justify-center">
+                    <div class="slide-content space-y-4 max-w-lg">
+                        <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                            Pengelolaan Wilayah
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-md">
+                            Unit-Unit Pasar Tradisional
+                        </h2>
+                        <p class="text-gray-100 text-sm md:text-base leading-relaxed drop-shadow">
+                            Informasi lengkap unit pasar di bawah naungan UPTD, mulai dari persebaran lokasi, kapasitas lapak, hingga fasilitas pendukung.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-4">
+                            <a href="{% url 'market:market_unit' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-3 rounded-xl text-sm transition shadow-lg border border-red-600/40">
+                                Lihat Unit Pasar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4 -->
+            <div class="carousel-slide w-full h-full flex-shrink-0 relative bg-zinc-900 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center z-0 block" alt="Aktivitas Pedagang Pasar">
+                <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/95 via-black/80 to-black/40 w-full h-full z-10 pointer-events-none"></div>
+
+                <div class="relative z-20 max-w-7xl mx-auto px-6 py-12 w-full h-full flex flex-col justify-center">
+                    <div class="slide-content space-y-4 max-w-lg">
+                        <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                            Sumber Daya Manusia
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-md">
+                            Staf & Keanggotaan
+                        </h2>
+                        <p class="text-gray-100 text-sm md:text-base leading-relaxed drop-shadow">
+                            Mengenal jajaran pimpinan, koordinator lapangan, serta staf operasional yang berdedikasi melayani aktivitas pasar harian.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-4">
+                            <a href="{% url 'membership:membership' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-3 rounded-xl text-sm transition shadow-lg border border-red-600/40">
+                                Lihat Keanggotaan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5 -->
+            <div class="carousel-slide w-full h-full flex-shrink-0 relative bg-zinc-900 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=1600" class="absolute inset-0 w-full h-full object-cover object-center z-0 block" alt="Dokumentasi Produk Pasar">
+                <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/95 via-black/80 to-black/40 w-full h-full z-10 pointer-events-none"></div>
+
+                <div class="relative z-20 max-w-7xl mx-auto px-6 py-12 w-full h-full flex flex-col justify-center">
+                    <div class="slide-content space-y-4 max-w-lg">
+                        <span class="inline-block bg-red-900/80 text-red-200 border border-red-600/60 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold shadow-lg">
+                            Dokumentasi
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white drop-shadow-md">
+                            Galeri Kegiatan & Kebersamaan
+                        </h2>
+                        <p class="text-gray-100 text-sm md:text-base leading-relaxed drop-shadow">
+                            Kumpulan foto dokumentasi berbagai agenda resmi, kegiatan penataan pasar, dan momen kebersamaan di lingkungan UPTD.
+                        </p>
+                        <div class="pt-2 flex flex-wrap gap-4">
+                            <a href="{% url 'core:gallery' %}" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white font-semibold px-6 py-3 rounded-xl text-sm transition shadow-lg border border-red-600/40">
+                                Buka Galeri Foto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
-    </section>
+
+        <!-- Navigasi Carousel -->
+        <button id="prevBtn" aria-label="Slide Sebelumnya" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2.5 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <button id="nextBtn" aria-label="Slide Selanjutnya" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-700/90 text-white p-2.5 rounded-full backdrop-blur-sm border border-zinc-700/50 transition z-30">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+
+        <!-- Indicators -->
+        <div id="carouselIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30"></div>
+
+    </div>
+</section>
 
     <!-- ========================================== -->
     <!-- SECTION 1: PROFIL PIMPINAN                -->

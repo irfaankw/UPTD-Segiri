@@ -5,6 +5,7 @@ from membership.models import Anggota
 
 from .models import Galeri, HeroBannerUtama, ProfilUPTD
 
+
 def home(request):
     profil = ProfilUPTD.objects.first()
     galeri_preview = Galeri.objects.all()[:3]
@@ -18,7 +19,7 @@ def home(request):
     # Ambil data hero banner utama
     hero_banner = HeroBannerUtama.objects.first()
 
-    # <-- 2. TAMBAHKAN QUERY PASAR DI SINI (Ambil 3 pasar pertama)
+    # Query 3 pasar pertama untuk beranda
     unit_pasar_list = Pasar.objects.all()[:3]
 
     context = {
@@ -28,12 +29,11 @@ def home(request):
         "pimpinan_list": pimpinan_list,
         "pimpinan_utama": pimpinan_utama,
         "hero_banner": hero_banner,
-        "unit_pasar_list": unit_pasar_list,  # <-- 3. MASUKKAN KE CONTEXT
+        "unit_pasar_list": unit_pasar_list,
     }
     return render(request, "core/home.html", context)
 
 
-# --- FUNGSI DI BAWAH INI TIDAK DISENTUH ---
 def uptd_profile(request):
     profil = ProfilUPTD.objects.first()
     pimpinan_list = Anggota.objects.filter(

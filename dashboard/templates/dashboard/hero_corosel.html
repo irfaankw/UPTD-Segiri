@@ -1,0 +1,67 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Hero Banner Utama{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'dashboard/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/market.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="adm-card adm-banner" style="padding:20px 24px;">
+    <div>
+        <p class="adm-banner-eyebrow">Pengaturan Beranda</p>
+        <h1 class="adm-banner-name" style="font-size:1.4rem;">Hero Banner Utama</h1>
+        <p class="adm-banner-role">Unggah gambar gambar utama untuk tampilan slide beranda depan</p>
+    </div>
+    <a href="{% url 'dashboard:home_dashboard' %}" class="adm-banner-badge">&larr; Kembali</a>
+</div>
+
+{# ===== BANNER RINGKASAN ERROR GLOBAL ===== #}
+{% if form.errors %}
+<div class="adm-card" style="background-color: #fef2f2; border: 1px solid #fca5a5; padding: 16px; margin-bottom: 20px;">
+    <h3 style="color: #991b1b; font-weight: 600; margin-bottom: 8px;">Gagal Menyimpan Data</h3>
+    <p style="color: #b91c1c; font-size: 0.9rem;">Periksa kembali berkas yang Anda unggah.</p>
+    {% if form.non_field_errors %}
+        <p style="color: #b91c1c; font-size: 0.85rem; margin-top: 4px;">{{ form.non_field_errors|join:", " }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" novalidate class="space-y-5">
+    {% csrf_token %}
+
+    {# ===== GAMBAR BANNER ===== #}
+    <div class="adm-card">
+        <div class="adm-panel-head">
+            <h2>Gambar Banner Utama</h2>
+            <p>Pilih file gambar beresolusi tinggi (disarankan rasio 16:9)</p>
+        </div>
+        <div class="adm-form-grid is-single">
+            <div class="adm-form-group">
+                <label for="{{ form.gambar.id_for_label }}">File Gambar Banner</label>
+                {{ form.gambar }}
+                {% if form.gambar.errors %}
+                    <p class="err" style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ form.gambar.errors|join:", " }}</p>
+                {% endif %}
+
+                {% if form.instance.gambar %}
+                <div class="adm-file-preview" style="margin-top: 12px;">
+                    <img src="{{ form.instance.gambar.url }}" alt="Banner Utama Saat Ini" style="max-height: 200px; object-fit: cover; border-radius: 8px;">
+                    <span class="name">Gambar saat ini — upload baru untuk mengganti.</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="adm-save-bar">
+        <p class="note">Pastikan ukuran file gambar sudah dikompresi sebelum diunggah.</p>
+        <a href="{% url 'dashboard:home_dashboard' %}" class="adm-btn adm-btn-outline">Batal</a>
+        <button type="submit" class="adm-btn adm-btn-primary">Simpan Banner</button>
+    </div>
+</form>
+
+{% endblock %}

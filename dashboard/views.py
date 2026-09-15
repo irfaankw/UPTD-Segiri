@@ -1,25 +1,35 @@
 import mimetypes
-from django.shortcuts import render, redirect, get_object_or_404
+from urllib.parse import urlencode
+
+from django import forms
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models.functions import Lower, Trim
-from django.core.paginator import Paginator
-
-from .decorators import staff_required
-from .forms import PasarForm, AnggotaForm, GaleriForm, ProfilUPTDForm, MisiUPTDForm
-from django import forms
 from django.forms import inlineformset_factory
-from urllib.parse import urlencode
-from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
-from market.models import (
-    Pasar, FotoAktivitasPasar, SaranaFasilitas, KomoditasUnggulan, DokumenResmi,
-)
+from django.shortcuts import get_object_or_404, redirect, render
 
 from complaint.models import Pengaduan
-from market.models import Pasar
+from core.models import Galeri, HeroBannerUtama, MisiUPTD, ProfilUPTD
+from market.models import (
+    DokumenResmi,
+    FotoAktivitasPasar,
+    KomoditasUnggulan,
+    Pasar,
+    SaranaFasilitas,
+)
 from membership.models import Anggota
-from core.models import Galeri, ProfilUPTD, MisiUPTD
+
+from .decorators import staff_required
+from .forms import (
+    AnggotaForm,
+    GaleriForm,
+    HeroBannerUtamaForm,
+    MisiUPTDForm,
+    PasarForm,
+    ProfilUPTDForm,
+)
 
 
 # ---------- DASHBOARD HOME ----------
@@ -55,12 +65,10 @@ def home_dashboard(request):
         "total_pengaduan": total_pengaduan,
         "pengaduan_pending": status_baru,
 
-        # dikonsumsi via json_script di template, dibaca sama home_charts.js
         "pasar_labels": [p.nama for p in pasar_qs],
         "pasar_data": [p.jumlah_pedagang for p in pasar_qs],
         "status_chart": {"selesai": status_selesai, "diproses": status_diproses, "baru": status_baru},
 
-        # dipakai buat teks di template (badge, legend, dst)
         "status_baru": status_baru,
         "status_diproses": status_diproses,
         "status_selesai": status_selesai,
@@ -70,9 +78,9 @@ def home_dashboard(request):
     }
     return render(request, "dashboard/home_dashboard.html", context)
 
+
 # ---------- PENGADUAN ----------
 def _build_page_range(current, total, window=2):
-    """Bikin daftar nomor halaman + None (buat elipsis '...') di komponen paginasi."""
     pages = sorted(set([1, total] + list(range(max(1, current - window), min(total, current + window) + 1))))
     result = []
     last = 0
@@ -161,6 +169,7 @@ def pengaduan_lampiran_lihat(request, pk):
     except FileNotFoundError:
         raise Http404("Lampiran tidak ditemukan.")
 
+
 # ---------- UNIT PASAR ----------
 FotoAktivitasFormSet = inlineformset_factory(
     Pasar, FotoAktivitasPasar,
@@ -213,9 +222,7 @@ def unit_pasar_list(request):
     }
     return render(request, "dashboard/market_list.html", context)
 
-
 def _build_pasar_formsets(request, pasar=None):
-    """Helper biar create & update gak duplikat kode instansiasi formset."""
     post = request.POST or None
     files = request.FILES or None
     return {
@@ -224,7 +231,6 @@ def _build_pasar_formsets(request, pasar=None):
         "komoditas_formset": KomoditasUnggulanFormSet(post, instance=pasar, prefix="komoditas"),
         "dokumen_formset": DokumenResmiFormSet(post, files, instance=pasar, prefix="dokumen"),
     }
-
 
 @staff_required
 def unit_pasar_create(request):
@@ -244,7 +250,6 @@ def unit_pasar_create(request):
     context = {"form": form, "mode": "tambah", **formsets}
     return render(request, "dashboard/market_form.html", context)
 
-
 @staff_required
 def unit_pasar_update(request, pk):
     pasar = get_object_or_404(Pasar, pk=pk)
@@ -262,7 +267,6 @@ def unit_pasar_update(request, pk):
 
     context = {"form": form, "mode": "edit", "pasar": pasar, **formsets}
     return render(request, "dashboard/market_form.html", context)
-
 
 @staff_required
 def unit_pasar_delete(request, pk):
@@ -412,6 +416,8 @@ def misi_hapus(request, pk):
         messages.success(request, "Misi dihapus.")
     return redirect("dashboard:profil_uptd")
 
+
+# ---------- PENCARIAN ----------
 @staff_required
 def pencarian(request):
     q = request.GET.get('q', '').strip()
@@ -427,3 +433,23 @@ def pencarian(request):
     total_hasil = sum(len(v) for v in hasil.values()) if q else 0
     context = {"q": q, "hasil": hasil, "total_hasil": total_hasil}
     return render(request, "dashboard/search_results.html", context)
+
+
+# ---------- HERO BANNER UTAMA ----------
+@staff_required
+def hero_banner_utama(request):
+    banner, _ = HeroBannerUtama.objects.get_or_create(pk=1)
+    form = HeroBannerUtamaForm(request.POST or None, request.FILES or None, instance=banner)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Gambar Banner Utama berhasil diperbarui.")
+            return redirect("dashboard:hero_banner_utama")
+        messages.error(request, "Gagal mengunggah gambar. Silakan periksa kembali file Anda.")
+
+    context = {
+        "form": form,
+        "banner": banner,
+    }
+    return render(request, "dashboard/hero_corosel.html", context)
