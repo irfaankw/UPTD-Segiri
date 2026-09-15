@@ -34,8 +34,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "cloudinary_storage",  # Storage backend Cloudinary (harus sebelum staticfiles)
     "django.contrib.staticfiles",
+    "cloudinary_storage",  # Storage backend Cloudinary (harus sebelum staticfiles)
     "cloudinary",          # Cloudinary core library
     "complaint",
     "core",
